@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { Bell, ClipboardList, LayoutDashboard, LogOut, Menu, User, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
@@ -7,18 +8,39 @@ import { useState } from "react";
 import { TemaDegistirici } from "@/components/layout/tema-degistirici";
 import { Dugme } from "@/components/ui/button";
 import { useKimlik } from "@/hooks/use-kimlik";
+import { bildirimlerApi } from "@/lib/api/bildirimler";
 import { cn } from "@/lib/utils";
 
 export function Basli() {
   const { kullanici, cikisYap, yukleniyor } = useKimlik();
   const [menuAcikMi, setMenuAcikMi] = useState(false);
 
-  // Dinamik gezinme bağlantıları: Ortak linkler ile başla
-  const gezinmeBaglantilari = [
-    { ad: "Ana Sayfa", yol: "/" },
-  ];
+  // 🔔 SADECE okunmamış bildirimleri çekiyoruz (Her 5 saniyede bir kontrol eder)
+  const { data: okunmamisData } = useQuery({
+    queryKey: ["okunmamis-bildirimler"],
+    queryFn: () => bildirimlerApi.listele(true),
+    enabled: !!kullanici,
+    refetchInterval: 5000, // 5 saniyede bir otomatik sorgula
+  });
 
-  // Kullanıcının rolüne göre ilgili linkleri ekle
+  // 🔍 Esnek Kontrol Mantığı: Dizi mi yoksa obje içinde veriler mi dönüyor?
+  const bildirimListesi = Array.isArray(okunmamisData)
+    ? okunmamisData
+    : (okunmamisData as any)?.veriler || (okunmamisData as any)?.items || [];
+
+  // 🔍 Okunmamış bildirim var mı? (Tüm olası alan isimlerini dener)
+  const okunmamisVarMi = bildirimListesi.some((b: any) => {
+    // Eğer backend doğrudan sadece okunmamışları döndürüyorsa ve liste boş değilse true'dur.
+    if (b.okundu === undefined && b.okundu_mu === undefined && b.is_read === undefined) {
+      return true;
+    }
+    // Alan isimlerinden hangisi varsa ona göre kontrol et:
+    return b.okundu === false || b.okundu_mu === false || b.is_read === false;
+  });
+
+  // Dinamik gezinme bağlantıları
+  const gezinmeBaglantilari = [{ ad: "Ana Sayfa", yol: "/" }];
+
   if (kullanici) {
     if (kullanici.rol === "vatandas") {
       gezinmeBaglantilari.push(
@@ -26,17 +48,12 @@ export function Basli() {
         { ad: "Taleplerim", yol: "/taleplerim" }
       );
     } else if (kullanici.rol === "personel") {
-      gezinmeBaglantilari.push(
-        { ad: "Atanan Taleplerim", yol: "/personel" }
-      );
+      gezinmeBaglantilari.push({ ad: "Atanan Taleplerim", yol: "/personel" });
     } else if (kullanici.rol === "admin") {
-      gezinmeBaglantilari.push(
-        { ad: "Talepler", yol: "/admin/talepler" }
-      );
+      gezinmeBaglantilari.push({ ad: "Talepler", yol: "/admin/talepler" });
     }
   }
 
-  // Ortak linkleri sona ekle
   gezinmeBaglantilari.push(
     { ad: "Harita", yol: "/harita" },
     { ad: "Duyurular", yol: "/duyurular" }
@@ -69,7 +86,6 @@ export function Basli() {
 
           {!yukleniyor && kullanici && (
             <>
-              {/* Pano ikonu SADECE personel rolüne özel yapıldı */}
               {kullanici.rol === "personel" && (
                 <Link href="/personel">
                   <Dugme varyant="hayalet" boyut="simge" aria-label="Personel Paneli">
@@ -84,11 +100,20 @@ export function Basli() {
                   </Dugme>
                 </Link>
               )}
-              <Link href="/bildirimler">
+
+              {/* 🔔 BİLDİRİM İKONU VE YANIP SÖNEN KIRMIZI NOKTA */}
+              <Link href="/bildirimler" className="relative inline-flex items-center justify-center">
                 <Dugme varyant="hayalet" boyut="simge" aria-label="Bildirimler">
                   <Bell size={18} />
                 </Dugme>
+                {okunmamisVarMi && (
+                  <span className="absolute top-1.5 right-1.5 flex h-2.5 w-2.5 pointer-events-none">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+                  </span>
+                )}
               </Link>
+
               <Link href="/profil" className="hidden items-center gap-2 sm:flex">
                 <Dugme varyant="hayalet" boyut="orta" className="gap-2">
                   <User size={16} />
