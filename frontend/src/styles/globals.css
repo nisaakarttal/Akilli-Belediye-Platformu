@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --zemin: 248 250 252; /* #F8FAFC */
+  --zemin-ikincil: 255 255 255;
+  --metin: 15 23 42; /* #0F172A */
+  --metin-ikincil: 71 85 105;
+  --kenarlik: 226 232 240;
+  --cam-arkaplan: 255 255 255 / 0.6;
+  --cam-kenarlik: 255 255 255 / 0.4;
+}
+
+.dark {
+  --zemin: 15 23 42; /* #0F172A */
+  --zemin-ikincil: 30 41 59;
+  --metin: 248 250 252;
+  --metin-ikincil: 148 163 184;
+  --kenarlik: 51 65 85;
+  --cam-arkaplan: 15 23 42 / 0.55;
+  --cam-kenarlik: 255 255 255 / 0.08;
+}
+
+body {
+  background-color: rgb(var(--zemin));
+  color: rgb(var(--metin));
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Glassmorphism kart yardımcı sınıfı */
+.cam-kart {
+  background-color: rgb(var(--cam-arkaplan));
+  border: 1px solid rgb(var(--cam-kenarlik));
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Kaydırma çubuğu */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--kenarlik));
+  border-radius: 9999px;
+}

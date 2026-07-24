@@ -1,0 +1,87 @@
+version: "3.9"
+
+services:
+  veritabani:
+    image: postgres:16-alpine
+    container_name: kapakli_veritabani
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-kapakli_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kapakli_sifre}
+      POSTGRES_DB: ${POSTGRES_DB:-kapakli_belediye}
+    volumes:
+      - kapakli_veritabani_verisi:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-kapakli_admin}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - kapakli_ag
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: kapakli_backend
+    restart: unless-stopped
+    env_file:
+      - backend/.env
+    environment:
+      DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-kapakli_admin}:${POSTGRES_PASSWORD:-kapakli_sifre}@veritabani:5432/${POSTGRES_DB:-kapakli_belediye}
+    volumes:
+      - ./backend:/uygulama
+      - kapakli_yuklemeler:/uygulama/uploads
+    ports:
+      - "8000:8000"
+    depends_on:
+      veritabani:
+        condition: service_healthy
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    networks:
+      - kapakli_ag
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kapakli_frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
+    volumes:
+      - ./frontend:/uygulama
+      - /uygulama/node_modules
+      - /uygulama/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - kapakli_ag
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: kapakli_nginx
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - kapakli_ag
+
+volumes:
+  kapakli_veritabani_verisi:
+  kapakli_yuklemeler:
+
+networks:
+  kapakli_ag:
+    driver: bridge
