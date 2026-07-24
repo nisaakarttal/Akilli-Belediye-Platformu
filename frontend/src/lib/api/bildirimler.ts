@@ -7,5 +7,8 @@ export const bildirimlerApi = {
 
   okunduYap: (id: string) => api.put<{ mesaj: string }>(`/bildirimler/${id}/okundu`).then((r) => r.data),
 
+  // Okunmadı olarak işaretleme metodu
+  okunmadiYap: (id: string) => api.put<{ mesaj: string }>(`/bildirimler/${id}/okunmadi`).then((r) => r.data),
+
   tumunuOkunduYap: () => api.put<{ mesaj: string }>("/bildirimler/tumunu-okundu-yap").then((r) => r.data),
 };

@@ -48,6 +48,26 @@ def bildirimi_okundu_yap(
     return MesajYaniti(mesaj="Bildirim okundu olarak işaretlendi.")
 
 
+@router.put("/{bildirim_id}/okunmadi", response_model=MesajYaniti)
+def bildirimi_okunmadi_yap(
+    bildirim_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    kullanici: Kullanici = Depends(gecerli_kullanicial),
+):
+    """Tek bir bildirimi okunmadı olarak işaretler."""
+    bildirim = (
+        db.query(Bildirim)
+        .filter(Bildirim.id == bildirim_id, Bildirim.kullanici_id == kullanici.id)
+        .first()
+    )
+    if bildirim is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bildirim bulunamadı.")
+
+    bildirim.okundu_mu = False
+    db.commit()
+    return MesajYaniti(mesaj="Bildirim okunmadı olarak işaretlendi.")
+
+
 @router.put("/tumunu-okundu-yap", response_model=MesajYaniti)
 def tum_bildirimleri_okundu_yap(
     db: Session = Depends(get_db),
