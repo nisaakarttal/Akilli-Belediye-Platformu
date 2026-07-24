@@ -5,7 +5,7 @@ Kapaklı Belediyesi (Tekirdağ) için geliştirilen, yapay zekâ destekli, vatan
 Vatandaşlar; şikâyet/talep oluşturabilir, taleplerini haritadan takip edebilir, yapay zekâ asistanı ile sohbet edebilir, duyuru ve haberlere ulaşabilir. Belediye personeli kendisine atanan talepleri yönetir, yöneticiler ise tüm sistemi tek bir kontrol panelinden izler.
 
 ---
-
+---
 
 
 ## 🧱 Teknoloji Yığını
