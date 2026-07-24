@@ -151,7 +151,7 @@ function TalepDetayIcerik() {
 
 export default function TalepDetaySayfasi() {
   return (
-    <KorumaliRota>
+    <KorumaliRota izinliRoller={["vatandas"]}>
       <TalepDetayIcerik />
     </KorumaliRota>
   );

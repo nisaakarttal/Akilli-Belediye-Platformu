@@ -1,6 +1,6 @@
 "use client";
 
-import { LayoutDashboard, MapPin, Tags, Users } from "lucide-react";
+import { FileText, LayoutDashboard, MapPin, Tags, Users } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 
 const MENU_OGELERI = [
   { ad: "Genel Bakış", yol: "/admin", ikon: LayoutDashboard },
+  { ad: "Talepler", yol: "/admin/talepler", ikon: FileText },
   { ad: "Kullanıcılar", yol: "/admin/kullanicilar", ikon: Users },
   { ad: "Kategoriler", yol: "/admin/kategoriler", ikon: Tags },
   { ad: "İlçe / Mahalle", yol: "/admin/konum", ikon: MapPin },

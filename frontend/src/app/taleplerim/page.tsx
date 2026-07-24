@@ -107,7 +107,7 @@ function TaleplerimIcerik() {
 
 export default function TaleplerimSayfasi() {
   return (
-    <KorumaliRota>
+    <KorumaliRota izinliRoller={["vatandas"]}>
       <TaleplerimIcerik />
     </KorumaliRota>
   );

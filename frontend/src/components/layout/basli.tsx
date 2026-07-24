@@ -9,17 +9,38 @@ import { Dugme } from "@/components/ui/button";
 import { useKimlik } from "@/hooks/use-kimlik";
 import { cn } from "@/lib/utils";
 
-const GEZINME_BAGLANTILARI = [
-  { ad: "Ana Sayfa", yol: "/" },
-  { ad: "Şikâyet Oluştur", yol: "/sikayet-olustur" },
-  { ad: "Taleplerim", yol: "/taleplerim" },
-  { ad: "Harita", yol: "/harita" },
-  { ad: "Duyurular", yol: "/duyurular" },
-];
-
 export function Basli() {
   const { kullanici, cikisYap, yukleniyor } = useKimlik();
   const [menuAcikMi, setMenuAcikMi] = useState(false);
+
+  // Dinamik gezinme bağlantıları: Ortak linkler ile başla
+  const gezinmeBaglantilari = [
+    { ad: "Ana Sayfa", yol: "/" },
+  ];
+
+  // Kullanıcının rolüne göre ilgili linkleri ekle
+  if (kullanici) {
+    if (kullanici.rol === "vatandas") {
+      gezinmeBaglantilari.push(
+        { ad: "Şikâyet Oluştur", yol: "/sikayet-olustur" },
+        { ad: "Taleplerim", yol: "/taleplerim" }
+      );
+    } else if (kullanici.rol === "personel") {
+      gezinmeBaglantilari.push(
+        { ad: "Atanan Taleplerim", yol: "/personel" }
+      );
+    } else if (kullanici.rol === "admin") {
+      gezinmeBaglantilari.push(
+        { ad: "Talepler", yol: "/admin/talepler" }
+      );
+    }
+  }
+
+  // Ortak linkleri sona ekle
+  gezinmeBaglantilari.push(
+    { ad: "Harita", yol: "/harita" },
+    { ad: "Duyurular", yol: "/duyurular" }
+  );
 
   return (
     <header className="sticky top-0 z-50 cam-kart border-b">
@@ -32,7 +53,7 @@ export function Basli() {
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
-          {GEZINME_BAGLANTILARI.map((baglanti) => (
+          {gezinmeBaglantilari.map((baglanti) => (
             <Link
               key={baglanti.yol}
               href={baglanti.yol}
@@ -48,7 +69,8 @@ export function Basli() {
 
           {!yukleniyor && kullanici && (
             <>
-              {(kullanici.rol === "personel" || kullanici.rol === "admin") && (
+              {/* Pano ikonu SADECE personel rolüne özel yapıldı */}
+              {kullanici.rol === "personel" && (
                 <Link href="/personel">
                   <Dugme varyant="hayalet" boyut="simge" aria-label="Personel Paneli">
                     <ClipboardList size={18} />
@@ -104,7 +126,7 @@ export function Basli() {
 
       <div className={cn("lg:hidden overflow-hidden transition-all", menuAcikMi ? "max-h-96" : "max-h-0")}>
         <nav className="flex flex-col gap-1 px-4 pb-4">
-          {GEZINME_BAGLANTILARI.map((baglanti) => (
+          {gezinmeBaglantilari.map((baglanti) => (
             <Link
               key={baglanti.yol}
               href={baglanti.yol}
