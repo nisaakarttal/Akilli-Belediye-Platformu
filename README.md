@@ -22,24 +22,25 @@ Vatandaşlar; şikâyet/talep oluşturabilir, taleplerini haritadan takip edebil
 
 **Konteynerleştirme:** Docker · Docker Compose · Nginx (reverse proxy)
 
+**Security:** JWT Authentication, Password Hashing, Account Lockout
 
 ---
 
-## 🗄️ Veritabanı
+##  Veritabanı
 
 Toplam **12 tablo** planlanmıştır: `kullanicilar`, `roller`, `talepler`, `talep_dosyalari`, `durum_gecmisi`, `bildirimler`, `kategoriler`, `ilceler`, `mahalleler`, `atamalar`, `ai_kayitlari`, `aktivite_kayitlari`.
 
 
 
 
-## 👥 Kullanıcı Rolleri
+##  Kullanıcı Rolleri
 
 - **Vatandaş (`vatandas`)** — Şikâyet/talep oluşturur, takip eder, AI asistan ile konuşur.
 - **Personel (`personel`)** — Kendisine atanan talepleri yönetir, durum günceller.
 - **Yönetici (`admin`)** — Tüm sistemi yönetir, istatistikleri görür, kullanıcı/kategori/ilçe tanımlar.
 
 ---
-##Güvenlik Listesi:
+## Güvenlik Listesi:
 
 ✅ Yanlış şifre limiti
 
