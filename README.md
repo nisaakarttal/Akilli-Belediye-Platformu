@@ -42,21 +42,27 @@ Toplam **12 tablo** planlanmıştır: `kullanicilar`, `roller`, `talepler`, `tal
 ---
 ## Güvenlik Listesi:
 
-✅ Yanlış şifre limiti
+1. Rate Limit              ✅
 
-⭐ Rate limiting
+2. Brute Force             ✅
+   
+3. Account Lock             ✅
+  
+4. Password Reset Security  ✅
 
-⭐ E-posta doğrulama
-
-⭐ Refresh token yönetimi
-
-⭐ Giriş logları
-
-⭐ Admin 2FA
-
-⭐ CORS + HTTPS
-
-⭐ Dosya güvenliği
+5. Şifre sıfırlama rate limit  ⭐
+  
+6. Email doğrulama             ⭐
+   
+7. Refresh token database       ⭐
+    
+8. Login audit log             ⭐
+  
+9. Admin 2FA                   ⭐
+    
+10. Dosya güvenliği            ⭐
+    
+11. HTTPS + production config  ⭐
 
 ## 📄 Lisans
 
