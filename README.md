@@ -41,12 +41,19 @@ Toplam **12 tablo** planlanmıştır: `kullanicilar`, `roller`, `talepler`, `tal
 ---
 Güvenlik Listesi:
 ✅ Yanlış şifre limiti
+
 ⭐ Rate limiting
+
 ⭐ E-posta doğrulama
+
 ⭐ Refresh token yönetimi
+
 ⭐ Giriş logları
+
 ⭐ Admin 2FA
+
 ⭐ CORS + HTTPS
+
 ⭐ Dosya güvenliği
 
 ## 📄 Lisans
