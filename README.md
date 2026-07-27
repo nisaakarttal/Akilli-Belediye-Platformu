@@ -39,7 +39,8 @@ Toplam **12 tablo** planlanmıştır: `kullanicilar`, `roller`, `talepler`, `tal
 - **Yönetici (`admin`)** — Tüm sistemi yönetir, istatistikleri görür, kullanıcı/kategori/ilçe tanımlar.
 
 ---
-Güvenlik Listesi:
+##Güvenlik Listesi:
+
 ✅ Yanlış şifre limiti
 
 ⭐ Rate limiting
