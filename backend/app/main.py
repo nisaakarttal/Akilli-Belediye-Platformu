@@ -1,19 +1,32 @@
-"""
-Kapaklı Akıllı Belediye Platformu — FastAPI Uygulama Girişi
-
-Kimlik doğrulama, kullanıcı/kategori/ilçe/mahalle yönetimi, talep (şikâyet)
-sistemi, yapay zekâ (Gemini) ve bildirim uç noktaları bağlıdır.
-Yönetici istatistik/dashboard uç noktaları henüz eklenmemiştir.
-"""
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api.v1 import admin, ai, auth, bildirimler, kategoriler, konum, kullanicilar, personel, talepler
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
+
+from dotenv import load_dotenv
+
+from app.api.v1 import (
+    admin,
+    ai,
+    auth,
+    bildirimler,
+    kategoriler,
+    konum,
+    kullanicilar,
+    personel,
+    talepler,
+)
+
 from app.core.config import get_settings
+from app.core.limiter import limiter
+
+
+load_dotenv()
 
 ayarlar = get_settings()
+
 
 app = FastAPI(
     title=ayarlar.APP_NAME,
@@ -23,6 +36,23 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
+
+# ==========================
+# RATE LIMITING
+# ==========================
+
+app.state.limiter = limiter
+
+app.add_exception_handler(
+    RateLimitExceeded,
+    _rate_limit_exceeded_handler
+)
+
+
+# ==========================
+# CORS
+# ==========================
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=ayarlar.cors_origin_listesi,
@@ -31,13 +61,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Yüklenen dosyalara (fotoğraf, video, belge) erişim
-app.mount("/uploads", StaticFiles(directory=ayarlar.UPLOAD_DIR), name="uploads")
 
+# ==========================
+# STATIC FILES
+# ==========================
+
+app.mount(
+    "/uploads",
+    StaticFiles(directory=ayarlar.UPLOAD_DIR),
+    name="uploads"
+)
+
+
+# ==========================
+# SYSTEM ENDPOINTS
+# ==========================
 
 @app.get("/", tags=["Sistem"])
 def kok():
-    """API'nin çalışır durumda olduğunu doğrulayan kök uç nokta."""
     return {
         "mesaj": f"{ayarlar.APP_NAME} API'sine hoş geldiniz.",
         "durum": "calisiyor",
@@ -47,16 +88,73 @@ def kok():
 
 @app.get("/api/v1/saglik", tags=["Sistem"])
 def saglik_kontrolu():
-    """Sağlık kontrolü — Docker/izleme araçları için."""
-    return {"durum": "saglikli"}
+    return {
+        "durum": "saglikli"
+    }
 
 
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["Kimlik Doğrulama"])
-app.include_router(kullanicilar.router, prefix="/api/v1/kullanicilar", tags=["Kullanıcılar"])
-app.include_router(kategoriler.router, prefix="/api/v1/kategoriler", tags=["Kategoriler"])
-app.include_router(konum.router, prefix="/api/v1", tags=["İlçeler ve Mahalleler"])
-app.include_router(talepler.router, prefix="/api/v1/talepler", tags=["Talepler"])
-app.include_router(ai.router, prefix="/api/v1/ai", tags=["Yapay Zekâ"])
-app.include_router(bildirimler.router, prefix="/api/v1/bildirimler", tags=["Bildirimler"])
-app.include_router(personel.router, prefix="/api/v1/personel", tags=["Personel"])
-app.include_router(admin.router, prefix="/api/v1/admin", tags=["Yönetici"])
+# ==========================
+# ROUTERS
+# ==========================
+
+app.include_router(
+    auth.router,
+    prefix="/api/v1/auth",
+    tags=["Kimlik Doğrulama"]
+)
+
+
+app.include_router(
+    kullanicilar.router,
+    prefix="/api/v1/kullanicilar",
+    tags=["Kullanıcılar"]
+)
+
+
+app.include_router(
+    kategoriler.router,
+    prefix="/api/v1/kategoriler",
+    tags=["Kategoriler"]
+)
+
+
+app.include_router(
+    konum.router,
+    prefix="/api/v1",
+    tags=["İlçeler ve Mahalleler"]
+)
+
+
+app.include_router(
+    talepler.router,
+    prefix="/api/v1/talepler",
+    tags=["Talepler"]
+)
+
+
+app.include_router(
+    ai.router,
+    prefix="/api/v1/ai",
+    tags=["Yapay Zekâ"]
+)
+
+
+app.include_router(
+    bildirimler.router,
+    prefix="/api/v1/bildirimler",
+    tags=["Bildirimler"]
+)
+
+
+app.include_router(
+    personel.router,
+    prefix="/api/v1/personel",
+    tags=["Personel"]
+)
+
+
+app.include_router(
+    admin.router,
+    prefix="/api/v1/admin",
+    tags=["Yönetici"]
+)
