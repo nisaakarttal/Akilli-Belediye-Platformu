@@ -64,6 +64,35 @@ Toplam **12 tablo** planlanmıştır: `kullanicilar`, `roller`, `talepler`, `tal
     
 11. HTTPS + production config  ⭐
 
+## Güvenlik mimari
+
+Kullanıcı
+   |
+   |
+Login isteği
+   |
+   |
+Rate Limit
+(5/dk IP)
+   |
+   |
+Kullanıcı kontrolü
+   |
+   |
+Şifre kontrolü
+   |
+   |
+Başarısız mı?
+   |
+   |
+Sayaç artır
+   |
+   |
+5 kere oldu mu?
+   |
+   |
+15 dk hesap kilidi
+
 ## 📄 Lisans
 
 Bu proje Kapaklı Belediyesi için özel olarak geliştirilmektedir.
