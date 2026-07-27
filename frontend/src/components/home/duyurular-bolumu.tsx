@@ -1,4 +1,10 @@
-import { Megaphone } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  BellRing,
+  CalendarDays,
+  Megaphone,
+} from "lucide-react";
 
 import { BolumBasligi } from "@/components/home/bolum-basligi";
 import { Kart, KartIcerik } from "@/components/ui/card";
@@ -40,25 +46,84 @@ const DUYURULAR: DuyuruOgesi[] = [
 
 export function DuyurularBolumu() {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
-      <BolumBasligi ikon={Megaphone} baslik="Duyurular" aciklama="Resmî belediye duyuruları" />
+    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
 
-      <div className="space-y-3">
+      <BolumBasligi
+        ikon={Megaphone}
+        baslik="Duyurular"
+        aciklama="Belediyemize ait güncel resmî duyuruları buradan takip edebilirsiniz."
+      />
+
+      <div className="mt-10 space-y-5">
         {DUYURULAR.map((duyuru) => (
-          <Kart key={duyuru.baslik} className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <KartIcerik className="flex flex-1 flex-col gap-1 pt-6 sm:flex-row sm:items-center sm:gap-4 sm:pt-6">
-              <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  {duyuru.onemli && (
-                    <span className="rounded-full bg-uyari/15 px-2 py-0.5 text-xs font-medium text-amber-700 dark:text-amber-300">
-                      Önemli
-                    </span>
+          <Kart
+            key={duyuru.baslik}
+            className="group overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-blue-300 hover:shadow-xl"
+          >
+            <KartIcerik className="p-0">
+
+              <div className="flex flex-col gap-6 p-6 md:flex-row md:items-center">
+
+                {/* Sol ikon */}
+                <div
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl ${
+                    duyuru.onemli
+                      ? "bg-red-100 text-red-600"
+                      : "bg-blue-100 text-blue-600"
+                  }`}
+                >
+                  {duyuru.onemli ? (
+                    <AlertCircle className="h-7 w-7" />
+                  ) : (
+                    <BellRing className="h-7 w-7" />
                   )}
-                  <h3 className="font-semibold text-metin">{duyuru.baslik}</h3>
                 </div>
-                <p className="mt-1 text-sm text-metin-ikincil">{duyuru.aciklama}</p>
+
+                {/* İçerik */}
+                <div className="flex-1">
+
+                  <div className="mb-3 flex flex-wrap items-center gap-3">
+
+                    {duyuru.onemli && (
+                      <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">
+                        Önemli Duyuru
+                      </span>
+                    )}
+
+                    <h3 className="text-xl font-bold text-slate-900 transition-colors group-hover:text-blue-600">
+                      {duyuru.baslik}
+                    </h3>
+
+                  </div>
+
+                  <p className="leading-7 text-slate-600">
+                    {duyuru.aciklama}
+                  </p>
+
+                  <div className="mt-5 flex items-center gap-2 text-sm text-slate-500">
+                    <CalendarDays className="h-4 w-4" />
+                    {duyuru.tarih}
+                  </div>
+                </div>
+
+                {/* Sağ ok */}
+                <div className="hidden md:flex">
+                  <div className="rounded-full bg-slate-100 p-3 transition-all duration-300 group-hover:bg-blue-600 group-hover:text-white">
+                    <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </div>
+                </div>
+
               </div>
-              <span className="shrink-0 text-xs text-metin-ikincil">{duyuru.tarih}</span>
+
+              {/* Alt çizgi */}
+              <div
+                className={`h-1 w-full transition-all duration-500 ${
+                  duyuru.onemli
+                    ? "bg-gradient-to-r from-red-500 to-orange-400"
+                    : "bg-gradient-to-r from-blue-600 to-cyan-400"
+                }`}
+              />
+
             </KartIcerik>
           </Kart>
         ))}
