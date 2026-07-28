@@ -186,7 +186,7 @@ export default function YoneticiKonumSayfasi() {
       {/* BAŞLIK VE YENİLEME EYLEMİ */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-metin-birincil sm:text-3xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-black tracking-tight text-metin sm:text-3xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
             Konum Yönetimi
           </h1>
           <p className="mt-1 text-sm text-metin-ikincil">
@@ -201,7 +201,7 @@ export default function YoneticiKonumSayfasi() {
             ilceleriYenile();
             mahalleleriYenile();
           }}
-          className="self-start gap-2 bg-beyaz border-blue-200 text-blue-600 hover:bg-blue-50 shadow-sm sm:self-auto"
+          className="self-start gap-2 bg-white border-blue-200 text-blue-600 hover:bg-blue-50 shadow-sm sm:self-auto"
         >
           <RefreshCw size={14} />
           <span>Verileri Yenile</span>
@@ -225,9 +225,9 @@ export default function YoneticiKonumSayfasi() {
       {/* ANA İKİLİ GRID */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* ==================== İLÇELER KARTI ==================== */}
-        <Kart className="flex flex-col border border-blue-100 bg-beyaz shadow-xl relative overflow-hidden">
+        <Kart className="flex flex-col border border-blue-100 bg-white shadow-xl relative overflow-hidden">
           <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-indigo-600" />
-          <KartBasligi className="border-b border-border/40 pb-4">
+          <KartBasligi className="border-b border-kenarlik/40 pb-4">
             <div className="flex items-center gap-2 font-bold text-blue-700">
               <Building size={20} className="text-blue-600" />
               <KartBaslik className="text-lg">İlçe Tanımları</KartBaslik>
@@ -247,7 +247,7 @@ export default function YoneticiKonumSayfasi() {
                     placeholder="Örn: Kapaklı"
                     value={ilceForm.ad}
                     onChange={(e) => setIlceForm({ ...ilceForm, ad: e.target.value })}
-                    className="bg-beyaz text-sm focus:border-blue-500 focus:ring-blue-200"
+                    className="bg-white text-sm focus:border-blue-500 focus:ring-blue-200"
                     required
                   />
                 </div>
@@ -259,7 +259,7 @@ export default function YoneticiKonumSayfasi() {
                     id="ilce-il"
                     value={ilceForm.il}
                     onChange={(e) => setIlceForm({ ...ilceForm, il: e.target.value })}
-                    className="bg-beyaz text-sm focus:border-blue-500 focus:ring-blue-200"
+                    className="bg-white text-sm focus:border-blue-500 focus:ring-blue-200"
                     required
                   />
                 </div>
@@ -275,13 +275,13 @@ export default function YoneticiKonumSayfasi() {
                     placeholder="Enlem (Lat)"
                     value={ilceForm.merkez_enlem}
                     onChange={(e) => setIlceForm({ ...ilceForm, merkez_enlem: e.target.value })}
-                    className="bg-beyaz text-xs font-mono"
+                    className="bg-white text-xs font-mono"
                   />
                   <Girdi
                     placeholder="Boylam (Lng)"
                     value={ilceForm.merkez_boylam}
                     onChange={(e) => setIlceForm({ ...ilceForm, merkez_boylam: e.target.value })}
-                    className="bg-beyaz text-xs font-mono"
+                    className="bg-white text-xs font-mono"
                   />
                 </div>
               </div>
@@ -322,7 +322,7 @@ export default function YoneticiKonumSayfasi() {
                           <Building size={16} />
                         </div>
                         <div>
-                          <p className="text-sm font-extrabold text-metin-birincil">{ilce.ad}</p>
+                          <p className="text-sm font-extrabold text-metin">{ilce.ad}</p>
                           <p className="text-[11px] text-blue-600 font-medium">{ilce.il}</p>
                         </div>
                       </div>
@@ -341,9 +341,9 @@ export default function YoneticiKonumSayfasi() {
         </Kart>
 
         {/* ==================== MAHALLELER KARTI ==================== */}
-        <Kart className="flex flex-col border border-fuchsia-100 bg-beyaz shadow-xl relative overflow-hidden">
+        <Kart className="flex flex-col border border-fuchsia-100 bg-white shadow-xl relative overflow-hidden">
           <div className="h-1.5 w-full bg-gradient-to-r from-fuchsia-500 to-pink-600" />
-          <KartBasligi className="border-b border-border/40 pb-4">
+          <KartBasligi className="border-b border-kenarlik/40 pb-4">
             <div className="flex items-center gap-2 font-bold text-fuchsia-700">
               <MapPin size={20} className="text-fuchsia-600" />
               <KartBaslik className="text-lg">Mahalle Tanımları</KartBaslik>
@@ -363,7 +363,7 @@ export default function YoneticiKonumSayfasi() {
                     placeholder="Örn: Cumhuriyet Mah."
                     value={mahalleForm.ad}
                     onChange={(e) => setMahalleForm({ ...mahalleForm, ad: e.target.value })}
-                    className="bg-beyaz text-sm focus:border-fuchsia-500 focus:ring-fuchsia-200"
+                    className="bg-white text-sm focus:border-fuchsia-500 focus:ring-fuchsia-200"
                     required
                   />
                 </div>
@@ -376,7 +376,7 @@ export default function YoneticiKonumSayfasi() {
                     id="mahalle-ilce"
                     value={mahalleForm.ilce_id}
                     onChange={(e) => setMahalleForm({ ...mahalleForm, ilce_id: e.target.value })}
-                    className="bg-beyaz text-sm focus:border-fuchsia-500 focus:ring-fuchsia-200"
+                    className="bg-white text-sm focus:border-fuchsia-500 focus:ring-fuchsia-200"
                     required
                   >
                     <option value="">İlçe seçiniz</option>
@@ -399,13 +399,13 @@ export default function YoneticiKonumSayfasi() {
                     placeholder="Enlem (Lat)"
                     value={mahalleForm.merkez_enlem}
                     onChange={(e) => setMahalleForm({ ...mahalleForm, merkez_enlem: e.target.value })}
-                    className="bg-beyaz text-xs font-mono"
+                    className="bg-white text-xs font-mono"
                   />
                   <Girdi
                     placeholder="Boylam (Lng)"
                     value={mahalleForm.merkez_boylam}
                     onChange={(e) => setMahalleForm({ ...mahalleForm, merkez_boylam: e.target.value })}
-                    className="bg-beyaz text-xs font-mono"
+                    className="bg-white text-xs font-mono"
                   />
                 </div>
               </div>
@@ -465,12 +465,12 @@ export default function YoneticiKonumSayfasi() {
                   value={mahalleArama}
                   onChange={(e) => setMahalleArama(e.target.value)}
                   placeholder="Mahalle adı yazarak süzün..."
-                  className="pl-8 text-xs bg-beyaz border-fuchsia-100 focus:border-fuchsia-400"
+                  className="pl-8 text-xs bg-white border-fuchsia-100 focus:border-fuchsia-400"
                 />
                 {mahalleArama && (
                   <button
                     onClick={() => setMahalleArama("")}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-metin-ikincil hover:text-metin-birincil"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-metin-ikincil hover:text-metin"
                   >
                     <X size={12} />
                   </button>
@@ -505,7 +505,7 @@ export default function YoneticiKonumSayfasi() {
                               <MapPin size={16} />
                             </div>
                             <div>
-                              <p className="text-sm font-extrabold text-metin-birincil">{mahalle.ad}</p>
+                              <p className="text-sm font-extrabold text-metin">{mahalle.ad}</p>
                               <p className="text-[11px] font-semibold text-fuchsia-600">
                                 {bagliIlce ? bagliIlce.ad : "İlçe Tanımsız"}
                               </p>

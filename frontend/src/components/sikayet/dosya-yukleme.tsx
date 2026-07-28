@@ -12,6 +12,13 @@ interface DosyaSeciciProps {
 }
 
 const KABUL_EDILEN_UZANTILAR = ".jpg,.jpeg,.png,.webp,.mp4,.mov,.webm,.mp3,.wav,.m4a,.pdf,.doc,.docx";
+const BAYT_BASINA_MEGABAYT = 1024 * 1024;
+const DOSYA_SIMGE_BOYUTU = 16;
+const YUKLEME_ALANI_SIMGE_BOYUTU = 18;
+
+const FOTOGRAF_UZANTILARI = ["jpg", "jpeg", "png", "webp"];
+const VIDEO_UZANTILARI = ["mp4", "mov", "webm"];
+const SES_UZANTILARI = ["mp3", "wav", "m4a", "ogg"];
 
 export function DosyaSecici({ dosyalar, onDegistir, className }: DosyaSeciciProps) {
   const girdiRef = useRef<HTMLInputElement>(null);
@@ -33,7 +40,7 @@ export function DosyaSecici({ dosyalar, onDegistir, className }: DosyaSeciciProp
         onClick={() => girdiRef.current?.click()}
         className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-dashed border-kenarlik px-4 py-6 text-sm text-metin-ikincil transition-colors hover:border-birincil-500 hover:text-birincil-600"
       >
-        <Paperclip size={18} />
+        <Paperclip size={YUKLEME_ALANI_SIMGE_BOYUTU} aria-hidden="true" />
         Fotoğraf, video, ses veya belge eklemek için tıklayın
       </button>
 
@@ -44,6 +51,7 @@ export function DosyaSecici({ dosyalar, onDegistir, className }: DosyaSeciciProp
         accept={KABUL_EDILEN_UZANTILAR}
         className="hidden"
         onChange={(e) => dosyaEkle(e.target.files)}
+        aria-label="Dosya seç"
       />
 
       {dosyalar.length > 0 && (
@@ -54,10 +62,10 @@ export function DosyaSecici({ dosyalar, onDegistir, className }: DosyaSeciciProp
               className="flex items-center justify-between gap-2 rounded-lg bg-black/5 px-3 py-2 text-sm dark:bg-white/5"
             >
               <span className="flex min-w-0 items-center gap-2">
-                <FileText size={16} className="shrink-0 text-metin-ikincil" />
+                <FileText size={DOSYA_SIMGE_BOYUTU} className="shrink-0 text-metin-ikincil" aria-hidden="true" />
                 <span className="truncate">{dosya.name}</span>
                 <span className="shrink-0 text-xs text-metin-ikincil">
-                  ({(dosya.size / (1024 * 1024)).toFixed(1)} MB)
+                  ({(dosya.size / BAYT_BASINA_MEGABAYT).toFixed(1)} MB)
                 </span>
               </span>
               <button
@@ -66,7 +74,7 @@ export function DosyaSecici({ dosyalar, onDegistir, className }: DosyaSeciciProp
                 className="shrink-0 text-metin-ikincil hover:text-tehlike"
                 aria-label={`${dosya.name} dosyasını kaldır`}
               >
-                <X size={16} />
+                <X size={DOSYA_SIMGE_BOYUTU} />
               </button>
             </li>
           ))}
@@ -79,8 +87,8 @@ export function DosyaSecici({ dosyalar, onDegistir, className }: DosyaSeciciProp
 /** Dosya adının uzantısına göre backend `DosyaTuru` enum değerini tahmin eder. */
 export function dosyaTuruTahminEt(dosyaAdi: string): "fotograf" | "video" | "ses" | "belge" {
   const uzanti = dosyaAdi.split(".").pop()?.toLowerCase() ?? "";
-  if (["jpg", "jpeg", "png", "webp"].includes(uzanti)) return "fotograf";
-  if (["mp4", "mov", "webm"].includes(uzanti)) return "video";
-  if (["mp3", "wav", "m4a", "ogg"].includes(uzanti)) return "ses";
+  if (FOTOGRAF_UZANTILARI.includes(uzanti)) return "fotograf";
+  if (VIDEO_UZANTILARI.includes(uzanti)) return "video";
+  if (SES_UZANTILARI.includes(uzanti)) return "ses";
   return "belge";
 }

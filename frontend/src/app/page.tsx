@@ -2,26 +2,20 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
-// Ekran üstü (Above the fold) temel bileşenler
-import { Basli } from "@/components/layout/basli";
+// Ekran üstü (above the fold) temel bileşenler
 import { Altbilgi } from "@/components/layout/altbilgi";
+import { Basli } from "@/components/layout/basli";
 import { Hero } from "@/components/home/hero";
 import { BilgiKartlariBolumu } from "@/components/home/bilgi-kartlari-bolumu";
 
 // Client Component üzerinden güvenli dynamic import
 import { YuzenAsistanWrapper } from "@/components/ai/yuzen-asistan-wrapper";
 
-// Server-side lazy loading (ssr: false OLMADAN)
-const HaberlerBolumu = dynamic(
-  () => import("@/components/home/haberler-bolumu").then((m) => m.HaberlerBolumu)
-);
-
-const DuyurularBolumu = dynamic(
-  () => import("@/components/home/duyurular-bolumu").then((m) => m.DuyurularBolumu)
-);
-
-const EtkinliklerBolumu = dynamic(
-  () => import("@/components/home/etkinlikler-bolumu").then((m) => m.EtkinliklerBolumu)
+// Sunucu tarafı tembel yükleme (ssr: false OLMADAN)
+const HaberlerBolumu = dynamic(() => import("@/components/home/haberler-bolumu").then((m) => m.HaberlerBolumu));
+const DuyurularBolumu = dynamic(() => import("@/components/home/duyurular-bolumu").then((m) => m.DuyurularBolumu));
+const EtkinliklerBolumu = dynamic(() =>
+  import("@/components/home/etkinlikler-bolumu").then((m) => m.EtkinliklerBolumu)
 );
 
 export const metadata: Metadata = {
@@ -45,7 +39,7 @@ export const metadata: Metadata = {
 
 export default function AnaSayfa() {
   return (
-    <div className="flex min-h-screen flex-col bg-arkaplan text-metin-birincil antialiased selection:bg-birincil-500 selection:text-beyaz">
+    <div className="flex min-h-screen flex-col bg-zemin text-metin antialiased selection:bg-birincil-500 selection:text-white">
       <Basli />
 
       <main id="ana-icerik" className="flex-1">
@@ -67,7 +61,7 @@ export default function AnaSayfa() {
 
       <Altbilgi />
 
-      {/* Güvenli yüklenen asistan */}
+      {/* Güvenli (istemci taraflı) yüklenen yapay zekâ asistanı */}
       <YuzenAsistanWrapper />
     </div>
   );
@@ -75,12 +69,12 @@ export default function AnaSayfa() {
 
 function BolumIskeleti() {
   return (
-    <div className="w-full py-16 px-4 max-w-7xl mx-auto animate-pulse">
-      <div className="h-8 w-48 bg-metin-ikincil/10 rounded-md mb-8 mx-auto" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="h-64 bg-metin-ikincil/10 rounded-2xl" />
-        <div className="h-64 bg-metin-ikincil/10 rounded-2xl" />
-        <div className="h-64 bg-metin-ikincil/10 rounded-2xl" />
+    <div className="mx-auto w-full max-w-7xl animate-pulse px-4 py-16">
+      <div className="mx-auto mb-8 h-8 w-48 rounded-md bg-metin-ikincil/10" />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <div className="h-64 rounded-2xl bg-metin-ikincil/10" />
+        <div className="h-64 rounded-2xl bg-metin-ikincil/10" />
+        <div className="h-64 rounded-2xl bg-metin-ikincil/10" />
       </div>
     </div>
   );

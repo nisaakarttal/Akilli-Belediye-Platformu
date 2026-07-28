@@ -13,13 +13,18 @@ import { kategorilerApi } from "@/lib/api/konum";
 import { taleplerApi } from "@/lib/api/talepler";
 import type { TalepDurumu } from "@/types";
 
-// 🌐 Harita bileşenini SSR kapalı olacak şekilde dinamik yükleyelim
+const HARITA_YUKSEKLIGI = 560;
+
+// Harita bileşenini SSR kapalı olacak şekilde dinamik yükle
 const TalepHaritasi = dynamic(
   () => import("@/components/harita/talep-haritasi").then((mod) => mod.TalepHaritasi),
   {
     ssr: false,
     loading: () => (
-      <div className="h-[560px] w-full animate-pulse rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+      <div
+        style={{ height: HARITA_YUKSEKLIGI }}
+        className="flex w-full animate-pulse items-center justify-center rounded-xl bg-black/5 text-sm text-metin-ikincil dark:bg-white/5"
+      >
         Harita yükleniyor...
       </div>
     ),
@@ -62,7 +67,11 @@ export default function HaritaSayfasi() {
           <KartIcerik className="flex flex-wrap gap-4 pt-6">
             <div className="min-w-[180px] flex-1">
               <Etiket htmlFor="durum-filtre">Durum</Etiket>
-              <Secim id="durum-filtre" value={durum} onChange={(e) => setDurum(e.target.value as TalepDurumu | "")}>
+              <Secim
+                id="durum-filtre"
+                value={durum}
+                onChange={(e) => setDurum(e.target.value as TalepDurumu | "")}
+              >
                 {DURUM_SECENEKLERI.map((s) => (
                   <option key={s.deger} value={s.deger}>
                     {s.etiket}
@@ -85,10 +94,12 @@ export default function HaritaSayfasi() {
         </Kart>
 
         {!isLoading && noktalar && (
-          <p className="mb-3 text-sm text-metin-ikincil">{noktalar.length} talep bulundu.</p>
+          <p className="mb-3 text-sm text-metin-ikincil" role="status">
+            {noktalar.length} talep bulundu.
+          </p>
         )}
 
-        <TalepHaritasi noktalar={noktalar ?? []} yukseklik={560} />
+        <TalepHaritasi noktalar={noktalar ?? []} yukseklik={HARITA_YUKSEKLIGI} />
       </main>
       <Altbilgi />
     </>

@@ -24,7 +24,7 @@ const HaritaSecici = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 w-full animate-pulse rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+      <div className="h-64 w-full animate-pulse rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center text-sm text-metin-ikincil">
         Harita yükleniyor...
       </div>
     ),

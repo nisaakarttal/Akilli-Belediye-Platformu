@@ -1,11 +1,14 @@
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
-import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { Loader2 } from "lucide-react";
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+const YUKLENIYOR_SIMGE_BOYUTU = 16;
+
 const dugmeVaryantlari = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-birincil-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
+  "relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-birincil-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
       varyant: {
@@ -33,14 +36,32 @@ const dugmeVaryantlari = cva(
 export interface DugmeProps
   extends ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof dugmeVaryantlari> {
+  /** `true` olduğunda `asChild` ile bir alt bileşene (ör. Link) devretme davranışı sağlar. */
   asChild?: boolean;
+  /** Dış eylem (API çağrısı vb.) sürerken dönme animasyonu gösterir ve tekrar tıklamayı engeller. */
+  yukleniyorMu?: boolean;
+  /** Yükleme sırasında gösterilecek metin; verilmezse mevcut içerik korunur. */
+  yukleniyorMetni?: ReactNode;
 }
 
 const Dugme = forwardRef<HTMLButtonElement, DugmeProps>(
-  ({ className, varyant, boyut, asChild = false, ...props }, ref) => {
+  (
+    { className, varyant, boyut, asChild = false, yukleniyorMu = false, yukleniyorMetni, disabled, children, ...props },
+    ref
+  ) => {
     const Bilesen = asChild ? Slot : "button";
+
     return (
-      <Bilesen className={cn(dugmeVaryantlari({ varyant, boyut, className }))} ref={ref} {...props} />
+      <Bilesen
+        className={cn(dugmeVaryantlari({ varyant, boyut, className }))}
+        ref={ref}
+        disabled={disabled || yukleniyorMu}
+        aria-busy={yukleniyorMu || undefined}
+        {...props}
+      >
+        {yukleniyorMu && <Loader2 className="animate-spin" size={YUKLENIYOR_SIMGE_BOYUTU} aria-hidden="true" />}
+        {yukleniyorMu ? yukleniyorMetni ?? children : children}
+      </Bilesen>
     );
   }
 );

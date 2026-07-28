@@ -16,6 +16,14 @@ const varsayilanIkon = L.icon({
   shadowSize: [41, 41],
 });
 
+const VARSAYILAN_YUKSEKLIK = 320;
+const YAKINLASTIRMA_SEVIYESI = 15;
+
+/** Leaflet, aynı DOM elemanına ikinci kez harita bağlanmaya çalışırsa hata fırlatır; bu iç işaretleyiciyi kontrol ederiz. */
+interface LeafletBagliKonteyner extends HTMLDivElement {
+  _leaflet_id?: number;
+}
+
 interface HaritaSeciciProps {
   enlem: number;
   boylam: number;
@@ -28,12 +36,12 @@ export function HaritaSecici({
   enlem,
   boylam,
   onDegistir,
-  yukseklik = 320,
+  yukseklik = VARSAYILAN_YUKSEKLIK,
   saltOkunur = false,
 }: HaritaSeciciProps) {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<LeafletBagliKonteyner | null>(null);
 
   const [monteEdildi, setMonteEdildi] = useState(false);
 
@@ -41,19 +49,17 @@ export function HaritaSecici({
     setMonteEdildi(true);
   }, []);
 
-  // Haritanın ilklendirilmesi ve Temizlenmesi (Cleanup)
+  // Haritanın ilklendirilmesi ve temizlenmesi — yalnızca ilk montajda çalışır
   useEffect(() => {
     if (!monteEdildi || !containerRef.current) return;
 
-    // EĞER konteyner üzerinde önceden kalmış bir Leaflet haritası varsa temizle
-    if ((containerRef.current as any)._leaflet_id) {
+    if (containerRef.current._leaflet_id) {
       containerRef.current.innerHTML = "";
     }
 
-    // Haritayı Sıfırdan Oluştur
     const map = L.map(containerRef.current, {
       center: [enlem, boylam],
-      zoom: 15,
+      zoom: YAKINLASTIRMA_SEVIYESI,
       dragging: !saltOkunur,
       scrollWheelZoom: !saltOkunur,
       doubleClickZoom: !saltOkunur,
@@ -66,11 +72,9 @@ export function HaritaSecici({
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıda bulunanlar',
     }).addTo(map);
 
-    // Marker ekle
     const marker = L.marker([enlem, boylam], { icon: varsayilanIkon }).addTo(map);
     markerRef.current = marker;
 
-    // Haritaya Tıklama Olayı (Salt Okunur Değilse)
     if (!saltOkunur) {
       map.on("click", (e: L.LeafletMouseEvent) => {
         const { lat, lng } = e.latlng;
@@ -79,21 +83,19 @@ export function HaritaSecici({
       });
     }
 
-    // 🪄 SİHİRLİ TEMİZLİK: Bileşen unmount olunca haritayı yok et!
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      mapRef.current?.remove();
+      mapRef.current = null;
     };
-  }, [monteEdildi]); // Sadece monte edildiğinde 1 kez çalışır
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [monteEdildi]);
 
-  // Dışarıdan enlem/boylam prop'ları değiştiğinde haritayı ve ikonu güncelle
+  // Dışarıdan enlem/boylam değiştiğinde haritayı ve ikonu güncelle
   useEffect(() => {
     if (!mapRef.current || !markerRef.current) return;
 
-    const currentLatLng = markerRef.current.getLatLng();
-    if (currentLatLng.lat !== enlem || currentLatLng.lng !== boylam) {
+    const guncelKonum = markerRef.current.getLatLng();
+    if (guncelKonum.lat !== enlem || guncelKonum.lng !== boylam) {
       markerRef.current.setLatLng([enlem, boylam]);
       mapRef.current.panTo([enlem, boylam]);
     }
@@ -104,6 +106,8 @@ export function HaritaSecici({
       <div
         style={{ height: yukseklik }}
         className="animate-pulse rounded-xl bg-black/5 dark:bg-white/5"
+        role="status"
+        aria-label="Harita yükleniyor"
       />
     );
   }

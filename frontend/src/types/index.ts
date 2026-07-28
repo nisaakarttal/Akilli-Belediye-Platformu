@@ -78,6 +78,8 @@ export interface TalepListe {
   kategori: Kategori;
   mahalle: Mahalle;
   olusturulma_tarihi: string;
+
+  atanan_personel_id: string | null;
 }
 
 export interface TalepDetay extends Omit<TalepListe, never> {

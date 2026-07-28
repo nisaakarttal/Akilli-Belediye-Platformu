@@ -22,7 +22,6 @@ import {
   FolderKanban,
   ShieldCheck,
   ArrowUpRight,
-  ChevronRight,
 } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 
@@ -202,7 +201,7 @@ export default function YoneticiKategorilerSayfasi() {
 
           <Dugme
             varyant="anahat"
-            boyut="varsayilan"
+            boyut="orta"
             onClick={() => refetch()}
             disabled={isRefetching}
             className="self-start lg:self-auto gap-2 rounded-2xl border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-md hover:shadow-xl transition-all active:scale-95"

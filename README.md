@@ -40,29 +40,42 @@ Toplam **12 tablo** planlanmıştır: `kullanicilar`, `roller`, `talepler`, `tal
 - **Yönetici (`admin`)** — Tüm sistemi yönetir, istatistikleri görür, kullanıcı/kategori/ilçe tanımlar.
 
 ---
-## Güvenlik Listesi:
+## 🔐 Mevcut Güvenlik Seviyesi
 
-1. Rate Limit              ✅
+Proje kapsamında aşağıdaki güvenlik önlemleri uygulanmıştır:
 
-2. Brute Force             ✅
-   
-3. Account Lock             ✅
-  
-4. Password Reset Security  ✅
+### Kimlik Doğrulama ve Yetkilendirme
+✔ BCrypt ile güvenli şifre hashleme  
+✔ JWT Authentication altyapısı  
+✔ Access Token yönetimi  
+✔ Refresh Token mekanizması  
+✔ Refresh Token'ların veritabanında saklanması ve iptal edilebilir oturum yönetimi  
+✔ Password Reset Token ile güvenli şifre sıfırlama akışı  
+✔ E-posta doğrulama (Email Verification) sistemi  
 
-5. Şifre sıfırlama rate limit  ⭐
-  
-6. Email doğrulama             ⭐
-   
-7. Refresh token database       ⭐
-    
-8. Login audit log             ⭐
-  
-9. Admin 2FA                   ⭐
-    
-10. Dosya güvenliği            ⭐
-    
-11. HTTPS + production config  ⭐
+### Hesap Güvenliği
+✔ Rate Limiting (istek sınırlandırma)  
+✔ Brute Force saldırılarına karşı koruma  
+✔ Başarısız girişlerde geçici hesap kilitleme mekanizması  
+✔ User Enumeration saldırılarına karşı koruma  
+✔ Dummy BCrypt Hash kullanımı ile kullanıcı varlığı bilgisinin gizlenmesi  
+✔ Şifre sıfırlama spam koruması  
+
+### API ve Uygulama Güvenliği
+✔ Swagger OAuth uyumluluğu  
+✔ CORS güvenlik yapılandırması  
+✔ Güvenli HTTP Status Code kullanımı  
+✔ Login Audit Log (giriş kayıtları)  
+✔ Dosya yükleme güvenliği:
+- İzin verilen dosya uzantısı kontrolü
+- MIME Type doğrulaması
+- Maksimum dosya boyutu kontrolü
+
+---
+
+## 🚀 Sıradaki Güvenlik Geliştirmeleri
+
+⭐ Admin kullanıcıları için 2FA (Two-Factor Authentication) desteği eklenmesi  
 
 ## Güvenlik mimari
 

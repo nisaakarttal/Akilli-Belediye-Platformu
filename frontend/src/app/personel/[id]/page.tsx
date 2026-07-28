@@ -31,6 +31,8 @@ const DURUM_SECENEKLERI: { deger: TalepDurumu; etiket: string }[] = [
   { deger: "kapatildi", etiket: "Kapatıldı" },
 ];
 
+const COZUM_NOTU_MIN_UZUNLUK = 5;
+
 function tarihiBicimlendir(isoTarih: string) {
   return new Date(isoTarih).toLocaleString("tr-TR", {
     day: "numeric",
@@ -101,7 +103,10 @@ export default function PersonelTalepDetaySayfasi() {
 
   return (
     <div className="space-y-6">
-      <Link href="/personel" className="inline-flex items-center gap-1.5 text-sm text-metin-ikincil hover:text-birincil-600">
+      <Link
+        href="/personel"
+        className="inline-flex items-center gap-1.5 text-sm text-metin-ikincil hover:text-birincil-600"
+      >
         <ArrowLeft size={16} /> Atanan Taleplerime Dön
       </Link>
 
@@ -128,11 +133,15 @@ export default function PersonelTalepDetaySayfasi() {
               <div className="grid gap-3 text-sm sm:grid-cols-2">
                 <div>
                   <p className="text-xs text-metin-ikincil">Bildiren</p>
-                  <p className="text-metin">{talep.olusturan.ad} {talep.olusturan.soyad}</p>
+                  <p className="text-metin">
+                    {talep.olusturan.ad} {talep.olusturan.soyad}
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-metin-ikincil">Kategori</p>
-                  <p className="text-metin">{talep.kategori.ad} ({talep.kategori.sorumlu_departman})</p>
+                  <p className="text-metin">
+                    {talep.kategori.ad} ({talep.kategori.sorumlu_departman})
+                  </p>
                 </div>
                 <div>
                   <p className="text-xs text-metin-ikincil">Mahalle</p>
@@ -164,7 +173,11 @@ export default function PersonelTalepDetaySayfasi() {
                 <form onSubmit={durumGuncelle} className="space-y-3">
                   <div>
                     <Etiket htmlFor="yeni-durum">Yeni Durum</Etiket>
-                    <Secim id="yeni-durum" value={yeniDurum} onChange={(e) => setYeniDurum(e.target.value as TalepDurumu)}>
+                    <Secim
+                      id="yeni-durum"
+                      value={yeniDurum}
+                      onChange={(e) => setYeniDurum(e.target.value as TalepDurumu)}
+                    >
                       {DURUM_SECENEKLERI.map((s) => (
                         <option key={s.deger} value={s.deger}>
                           {s.etiket}
@@ -181,8 +194,13 @@ export default function PersonelTalepDetaySayfasi() {
                       placeholder="Vatandaşa iletilecek kısa bir not..."
                     />
                   </div>
-                  <Dugme type="submit" varyant="birincil" disabled={durumGuncelleniyor}>
-                    {durumGuncelleniyor ? "Güncelleniyor..." : "Durumu Güncelle"}
+                  <Dugme
+                    type="submit"
+                    varyant="birincil"
+                    yukleniyorMu={durumGuncelleniyor}
+                    yukleniyorMetni="Güncelleniyor..."
+                  >
+                    Durumu Güncelle
                   </Dugme>
                 </form>
               </KartIcerik>
@@ -211,8 +229,14 @@ export default function PersonelTalepDetaySayfasi() {
                     <Etiket>Sonuç Fotoğrafı</Etiket>
                     <DosyaSecici dosyalar={sonucDosyalari} onDegistir={setSonucDosyalari} />
                   </div>
-                  <Dugme type="submit" varyant="birincil" disabled={cozuluyor || cozumNotu.length < 5}>
-                    {cozuluyor ? "Kaydediliyor..." : "Talebi Çözüldü Olarak İşaretle"}
+                  <Dugme
+                    type="submit"
+                    varyant="birincil"
+                    disabled={cozumNotu.length < COZUM_NOTU_MIN_UZUNLUK}
+                    yukleniyorMu={cozuluyor}
+                    yukleniyorMetni="Kaydediliyor..."
+                  >
+                    Talebi Çözüldü Olarak İşaretle
                   </Dugme>
                 </form>
               </KartIcerik>

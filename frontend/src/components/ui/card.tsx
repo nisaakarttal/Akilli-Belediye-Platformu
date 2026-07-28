@@ -6,7 +6,10 @@ const Kart = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
-      className={cn("cam-kart rounded-2xl shadow-cam dark:shadow-cam-koyu", className)}
+      className={cn(
+        "cam-kart rounded-2xl shadow-cam transition-shadow duration-200 dark:shadow-cam-koyu",
+        className
+      )}
       {...props}
     />
   )
@@ -22,7 +25,11 @@ KartBasligi.displayName = "KartBasligi";
 
 const KartBaslik = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingElement>>(
   ({ className, ...props }, ref) => (
-    <h3 ref={ref} className={cn("text-xl font-semibold leading-none tracking-tight text-metin", className)} {...props} />
+    <h3
+      ref={ref}
+      className={cn("text-xl font-semibold leading-none tracking-tight text-metin", className)}
+      {...props}
+    />
   )
 );
 KartBaslik.displayName = "KartBaslik";

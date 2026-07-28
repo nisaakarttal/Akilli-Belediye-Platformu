@@ -11,12 +11,9 @@ import {
   Building,
   Calendar,
   Layers,
-  CheckCircle2,
-  AlertCircle,
   Loader2,
   UserCheck,
   Tag,
-  ShieldAlert,
   Sparkles,
 } from "lucide-react";
 import dynamic from "next/dynamic";
@@ -127,7 +124,7 @@ function AdminTalepDetayIcerik() {
         <div className="space-y-6">
           {/* ==================== 1. TALEP ÜST BAŞLIK KARTI ==================== */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
-            <Kart className="relative overflow-hidden border border-indigo-100 bg-beyaz shadow-xl">
+            <Kart className="relative overflow-hidden border border-indigo-100 bg-white shadow-xl">
               <div className="h-2 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
               <KartBasligi className="border-b border-indigo-50 pb-5 pt-6">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -141,7 +138,7 @@ function AdminTalepDetayIcerik() {
                         {tarihiBicimlendir(talep.olusturulma_tarihi)}
                       </span>
                     </div>
-                    <KartBaslik className="text-xl sm:text-2xl font-black text-metin-birincil">
+                    <KartBaslik className="text-xl sm:text-2xl font-black text-metin">
                       {talep.baslik}
                     </KartBaslik>
                   </div>
@@ -170,7 +167,7 @@ function AdminTalepDetayIcerik() {
                     </div>
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-wider text-blue-900/70">Kategori</p>
-                      <p className="text-sm font-extrabold text-metin-birincil">{talep.kategori.ad}</p>
+                      <p className="text-sm font-extrabold text-metin">{talep.kategori.ad}</p>
                     </div>
                   </div>
 
@@ -180,7 +177,7 @@ function AdminTalepDetayIcerik() {
                     </div>
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-wider text-purple-900/70">Sorumlu Birim</p>
-                      <p className="text-sm font-extrabold text-metin-birincil">{talep.kategori.sorumlu_departman}</p>
+                      <p className="text-sm font-extrabold text-metin">{talep.kategori.sorumlu_departman}</p>
                     </div>
                   </div>
 
@@ -190,7 +187,7 @@ function AdminTalepDetayIcerik() {
                     </div>
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-900/70">Mahalle / Bölge</p>
-                      <p className="text-sm font-extrabold text-metin-birincil">{talep.mahalle.ad}</p>
+                      <p className="text-sm font-extrabold text-metin">{talep.mahalle.ad}</p>
                     </div>
                   </div>
                 </div>
@@ -200,7 +197,7 @@ function AdminTalepDetayIcerik() {
 
           {/* ==================== 2. PERSONEL ATAMA PANELİ ==================== */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Kart className="border border-indigo-100 bg-beyaz shadow-lg relative overflow-hidden">
+            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 to-teal-600" />
               <KartBasligi className="border-b border-indigo-50 pb-4">
                 <KartBaslik className="flex items-center gap-2 text-lg text-indigo-950 font-extrabold">
@@ -227,7 +224,7 @@ function AdminTalepDetayIcerik() {
                     <Secim
                       value={secilenPersonelId}
                       onChange={(e) => setSecilenPersonelId(e.target.value)}
-                      className="bg-beyaz border-indigo-200 focus:border-indigo-500 text-sm font-medium"
+                      className="bg-white border-indigo-200 focus:border-indigo-500 text-sm font-medium"
                       disabled={personellerYukleniyor}
                     >
                       <option value="">
@@ -266,7 +263,7 @@ function AdminTalepDetayIcerik() {
 
           {/* ==================== 3. HARİTA KOORDİNAT KARTI ==================== */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Kart className="border border-indigo-100 bg-beyaz shadow-lg relative overflow-hidden">
+            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-cyan-500 to-blue-600" />
               <KartBasligi className="border-b border-indigo-50 pb-4">
                 <div className="flex items-center justify-between">
@@ -289,7 +286,7 @@ function AdminTalepDetayIcerik() {
 
           {/* ==================== 4. EKLER & DOSYALAR ==================== */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Kart className="border border-indigo-100 bg-beyaz shadow-lg relative overflow-hidden">
+            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-fuchsia-500 to-pink-600" />
               <KartBasligi className="border-b border-indigo-50 pb-4">
                 <KartBaslik className="flex items-center gap-2 text-lg text-indigo-950 font-extrabold">
@@ -305,7 +302,7 @@ function AdminTalepDetayIcerik() {
 
           {/* ==================== 5. ZAMAN TÜNELİ KARTI ==================== */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-            <Kart className="border border-indigo-100 bg-beyaz shadow-lg relative overflow-hidden">
+            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
               <div className="h-1.5 w-full bg-gradient-to-r from-amber-500 to-orange-600" />
               <KartBasligi className="border-b border-indigo-50 pb-4">
                 <KartBaslik className="flex items-center gap-2 text-lg text-indigo-950 font-extrabold">

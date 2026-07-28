@@ -10,7 +10,7 @@ from app.models.refresh_token import RefreshToken
 from app.api.deps import gecerli_kullanicial
 from app.core.database import get_db
 from app.core.limiter import limiter
-
+from fastapi.responses import JSONResponse
 import math
 from app.core.config import get_settings
 from app.models.kullanici import Kullanici
@@ -166,7 +166,7 @@ def kayit_ol(
     )
 
 
-@router.post("/giris", response_model=TokenYaniti)
+@router.post("/giris")
 @limiter.limit("5/minute")
 def giris_yap(
     request: Request,
@@ -303,7 +303,6 @@ def giris_yap(
 
 @router.post(
     "/giris/form",
-    response_model=TokenYaniti,
     include_in_schema=False
 )
 def giris_yap_form(
@@ -325,17 +324,20 @@ def giris_yap_form(
     )
 
 
-@router.post("/yenile", response_model=TokenYaniti)
+@router.post("/yenile")
 def token_yenile(
     request: Request,
-    istek: YenilemeIstegi,
     db: Session = Depends(get_db)
 ):
+    refresh_token = request.cookies.get("refresh_token")
 
-    payload = tokeni_coz(
-        istek.yenileme_tokeni
-    )
+    if not refresh_token:
+        raise HTTPException(
+            status_code=401,
+            detail="Refresh token bulunamadı."
+        )
 
+    payload = tokeni_coz(refresh_token)
 
     if (
         payload is None
@@ -347,7 +349,6 @@ def token_yenile(
         )
 
 
-    # Kullanıcı kontrolü
     kullanici = (
         db.query(Kullanici)
         .filter(
@@ -362,6 +363,7 @@ def token_yenile(
             detail="Kullanıcı bulunamadı."
         )
 
+
     if not kullanici.aktif_mi:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -369,9 +371,8 @@ def token_yenile(
         )
 
 
-    # Refresh token DB kontrolü
-    token_hash =token_hashle(
-        istek.yenileme_tokeni
+    token_hash = token_hashle(
+        refresh_token
     )
 
 
@@ -408,12 +409,13 @@ def token_yenile(
         )
 
 
-    # Eski refresh token iptal edilir
+    # Eski refresh token iptal edilir (rotation)
     kayit.iptal_edildi = True
 
     db.commit()
 
 
+    # Yeni access + refresh token oluşturulur
     return _token_yaniti_olustur(
         kullanici,
         db,
@@ -520,7 +522,7 @@ def _token_yaniti_olustur(
     kullanici: Kullanici,
     db: Session,
     request: Request | None = None,
-) -> TokenYaniti:
+):
 
     veri = {
         "sub": str(kullanici.id),
@@ -561,12 +563,25 @@ def _token_yaniti_olustur(
     db.commit()
     db.refresh(refresh_token_kayit)
 
-
-    return TokenYaniti(
-        erisim_tokeni=erisim_tokeni,
-        yenileme_tokeni=refresh_tokeni,
-        kullanici=KullaniciYaniti.model_validate(kullanici),
+    response = JSONResponse(
+        content={
+            "erisim_tokeni": erisim_tokeni,
+            "kullanici": KullaniciYaniti.model_validate(kullanici).model_dump(
+                mode="json"
+            )
+        }
     )
+
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_tokeni,
+        httponly=True,
+        secure=ayarlar.ENVIRONMENT == "production",
+        samesite="strict",
+        max_age=60 * 60 * 24 * ayarlar.REFRESH_TOKEN_EXPIRE_DAYS,
+    )
+
+    return response
 
 @router.get(
     "/email-dogrula",
@@ -616,3 +631,44 @@ def email_dogrula(
     return MesajYaniti(
         mesaj="Email adresiniz başarıyla doğrulandı."
     )
+@router.post("/cikis")
+def cikis_yap(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+
+    refresh_token = request.cookies.get(
+        "refresh_token"
+    )
+
+    if refresh_token:
+
+        token_hash = token_hashle(
+            refresh_token
+        )
+
+        kayit = (
+            db.query(RefreshToken)
+            .filter(
+                RefreshToken.token_hash == token_hash
+            )
+            .first()
+        )
+
+        if kayit:
+            kayit.iptal_edildi = True
+            db.commit()
+
+
+    response = JSONResponse(
+        content={
+            "mesaj": "Başarıyla çıkış yapıldı."
+        }
+    )
+
+    response.delete_cookie(
+        key="refresh_token",
+        path="/"
+    )
+
+    return response

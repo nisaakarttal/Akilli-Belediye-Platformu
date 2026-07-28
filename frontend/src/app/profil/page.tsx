@@ -16,16 +16,19 @@ import { Uyari } from "@/components/ui/uyari";
 import { useKimlik } from "@/hooks/use-kimlik";
 import { apiHataMesaji } from "@/lib/api";
 import { kullanicilarApi } from "@/lib/api/kullanicilar";
+import type { KullaniciRolu } from "@/types";
+
+const TELEFON_FORMAT_DUZENLI_IFADE = /^0(5\d{2})\d{7}$/;
 
 const profilSemasi = z.object({
   ad: z.string().min(2, "Ad en az 2 karakter olmalıdır.").max(100),
   soyad: z.string().min(2, "Soyad en az 2 karakter olmalıdır.").max(100),
-  telefon: z.string().regex(/^0(5\d{2})\d{7}$/, "Telefon numarası 05XXXXXXXXX formatında olmalıdır."),
+  telefon: z.string().regex(TELEFON_FORMAT_DUZENLI_IFADE, "Telefon numarası 05XXXXXXXXX formatında olmalıdır."),
   adres: z.string().max(500).optional().or(z.literal("")),
 });
 type ProfilFormu = z.infer<typeof profilSemasi>;
 
-const ROL_ETIKETI: Record<string, string> = {
+const ROL_ETIKETI: Record<KullaniciRolu, string> = {
   vatandas: "Vatandaş",
   personel: "Personel",
   admin: "Yönetici",
@@ -89,27 +92,27 @@ function ProfilIcerik() {
             {basariMesaji && <Uyari tur="basari">{basariMesaji}</Uyari>}
 
             <div>
-              <Etiket>E-posta Adresi</Etiket>
-              <Girdi value={kullanici.e_posta} disabled />
+              <Etiket htmlFor="e_posta">E-posta Adresi</Etiket>
+              <Girdi id="e_posta" value={kullanici.e_posta} disabled />
             </div>
 
-            <form onSubmit={handleSubmit(gonder)} className="space-y-4">
+            <form onSubmit={handleSubmit(gonder)} className="space-y-4" noValidate>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Etiket htmlFor="ad">Ad</Etiket>
-                  <Girdi id="ad" {...register("ad")} />
+                  <Girdi id="ad" hataliMi={!!errors.ad} {...register("ad")} />
                   {errors.ad && <p className="mt-1 text-xs text-tehlike">{errors.ad.message}</p>}
                 </div>
                 <div>
                   <Etiket htmlFor="soyad">Soyad</Etiket>
-                  <Girdi id="soyad" {...register("soyad")} />
+                  <Girdi id="soyad" hataliMi={!!errors.soyad} {...register("soyad")} />
                   {errors.soyad && <p className="mt-1 text-xs text-tehlike">{errors.soyad.message}</p>}
                 </div>
               </div>
 
               <div>
                 <Etiket htmlFor="telefon">Telefon</Etiket>
-                <Girdi id="telefon" {...register("telefon")} />
+                <Girdi id="telefon" hataliMi={!!errors.telefon} {...register("telefon")} />
                 {errors.telefon && <p className="mt-1 text-xs text-tehlike">{errors.telefon.message}</p>}
               </div>
 
@@ -118,8 +121,8 @@ function ProfilIcerik() {
                 <Girdi id="adres" {...register("adres")} />
               </div>
 
-              <Dugme type="submit" varyant="birincil" disabled={kaydediliyor}>
-                {kaydediliyor ? "Kaydediliyor..." : "Bilgileri Kaydet"}
+              <Dugme type="submit" varyant="birincil" yukleniyorMu={kaydediliyor} yukleniyorMetni="Kaydediliyor...">
+                Bilgileri Kaydet
               </Dugme>
             </form>
           </KartIcerik>

@@ -11,8 +11,8 @@ import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card"
 import { Girdi } from "@/components/ui/input";
 import { Etiket } from "@/components/ui/label";
 import { Uyari } from "@/components/ui/uyari";
-import { authApi } from "@/lib/api/auth";
 import { apiHataMesaji } from "@/lib/api";
+import { authApi } from "@/lib/api/auth";
 import { type SifremiUnuttumFormu, sifremiUnuttumSemasi } from "@/lib/validasyon";
 
 export default function SifremiUnuttumSayfasi() {
@@ -58,17 +58,35 @@ export default function SifremiUnuttumSayfasi() {
             {basariMesaji ? (
               <Uyari tur="basari">{basariMesaji}</Uyari>
             ) : (
-              <form onSubmit={handleSubmit(gonder)} className="space-y-4">
+              <form onSubmit={handleSubmit(gonder)} className="space-y-4" noValidate>
                 {sunucuHatasi && <Uyari tur="hata">{sunucuHatasi}</Uyari>}
 
                 <div>
                   <Etiket htmlFor="e_posta">E-posta Adresi</Etiket>
-                  <Girdi id="e_posta" type="email" placeholder="ornek@kapakli.bel.tr" {...register("e_posta")} />
-                  {errors.e_posta && <p className="mt-1 text-xs text-tehlike">{errors.e_posta.message}</p>}
+                  <Girdi
+                    id="e_posta"
+                    type="email"
+                    placeholder="ornek@kapakli.bel.tr"
+                    hataliMi={!!errors.e_posta}
+                    aria-describedby={errors.e_posta ? "e_posta-hata" : undefined}
+                    {...register("e_posta")}
+                  />
+                  {errors.e_posta && (
+                    <p id="e_posta-hata" className="mt-1 text-xs text-tehlike">
+                      {errors.e_posta.message}
+                    </p>
+                  )}
                 </div>
 
-                <Dugme type="submit" varyant="birincil" boyut="buyuk" className="w-full" disabled={gonderiliyor}>
-                  {gonderiliyor ? "Gönderiliyor..." : "Sıfırlama Bağlantısı Gönder"}
+                <Dugme
+                  type="submit"
+                  varyant="birincil"
+                  boyut="buyuk"
+                  className="w-full"
+                  yukleniyorMu={gonderiliyor}
+                  yukleniyorMetni="Gönderiliyor..."
+                >
+                  Sıfırlama Bağlantısı Gönder
                 </Dugme>
               </form>
             )}

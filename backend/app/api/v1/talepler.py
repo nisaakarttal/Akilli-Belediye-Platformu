@@ -31,9 +31,19 @@ from app.schemas.talep import (
 from app.services.bildirim_servisi import bildirim_olustur
 from app.utils.dosya_yardimcisi import dosya_kaydet
 from app.utils.takip_no import takip_no_uret
+from app.core.config import get_settings
+from pathlib import Path
 
 router = APIRouter()
+ayarlar = get_settings()
 
+ALLOWED_EXTENSIONS = {
+    DosyaTuru.FOTOGRAF: {".jpg", ".jpeg", ".png", ".webp"},
+    DosyaTuru.VIDEO: {".mp4", ".mov", ".avi", ".webm"},
+    DosyaTuru.SES: {".mp3", ".wav", ".ogg"},
+    DosyaTuru.BELGE: {".pdf", ".doc", ".docx"},
+    DosyaTuru.SONUC_FOTOGRAFI: {".jpg", ".jpeg", ".png", ".webp"},
+}
 
 def _talep_sorgu_temel(db: Session):
     return db.query(Talep).options(
@@ -215,6 +225,65 @@ def talep_dosyasi_yukle(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Sonuç fotoğrafı yalnızca personel/yönetici tarafından yüklenebilir.",
         )
+
+    if not dosya.filename:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Dosya adı bulunamadı."
+        )
+
+    uzanti = Path(dosya.filename).suffix.lower()
+
+    if uzanti not in ALLOWED_EXTENSIONS[dosya_turu]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Bu dosya türü için '{uzanti}' uzantısına izin verilmiyor."
+        )
+
+    ALLOWED_MIME_TYPES = {
+        DosyaTuru.FOTOGRAF: {
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        },
+        DosyaTuru.VIDEO: {
+            "video/mp4",
+            "video/quicktime",
+            "video/x-msvideo",
+            "video/webm",
+        },
+        DosyaTuru.SES: {
+            "audio/mpeg",
+            "audio/wav",
+            "audio/ogg",
+        },
+        DosyaTuru.BELGE: {
+            "application/pdf",
+            "application/msword",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        },
+        DosyaTuru.SONUC_FOTOGRAFI: {
+            "image/jpeg",
+            "image/png",
+            "image/webp",
+        },
+    }
+
+    if dosya.content_type not in ALLOWED_MIME_TYPES[dosya_turu]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Geçersiz dosya türü."
+        )
+
+    icerik = dosya.file.read()
+
+    if len(icerik) > ayarlar.MAX_UPLOAD_SIZE_MB * 1024 * 1024:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"Dosya en fazla {ayarlar.MAX_UPLOAD_SIZE_MB} MB olabilir."
+        )
+
+    dosya.file.seek(0)
 
     goreli_yol, boyut_bayt = dosya_kaydet(dosya, dosya_turu, "sikayetler")
 

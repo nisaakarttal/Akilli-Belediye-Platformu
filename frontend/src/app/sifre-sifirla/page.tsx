@@ -17,7 +17,9 @@ import { apiHataMesaji } from "@/lib/api";
 import { authApi } from "@/lib/api/auth";
 import { type SifreSifirlaFormu, sifreSifirlaSemasi } from "@/lib/validasyon";
 
-function SifreSifirlaFormu_() {
+const GIRIS_YONLENDIRME_GECIKMESI_MS = 2000;
+
+function SifreSifirlaIcerik() {
   const router = useRouter();
   const aramaParametreleri = useSearchParams();
   const token = aramaParametreleri.get("token");
@@ -42,7 +44,7 @@ function SifreSifirlaFormu_() {
     try {
       const yanit = await authApi.sifreSifirla(token, veri.yeniSifre);
       setBasariMesaji(yanit.mesaj);
-      setTimeout(() => router.push("/giris"), 2000);
+      setTimeout(() => router.push("/giris"), GIRIS_YONLENDIRME_GECIKMESI_MS);
     } catch (hata) {
       setSunucuHatasi(apiHataMesaji(hata, "Şifre sıfırlanamadı. Bağlantının süresi dolmuş olabilir."));
     } finally {
@@ -64,31 +66,54 @@ function SifreSifirlaFormu_() {
             <p className="text-sm text-metin-ikincil">Hesabınız için yeni bir şifre oluşturun.</p>
           </KartBasligi>
           <KartIcerik>
-            {!token && <Uyari tur="hata">Sıfırlama bağlantısı geçersiz. Lütfen e-postanızdaki bağlantıyı kullanın.</Uyari>}
+            {!token && (
+              <Uyari tur="hata">
+                Sıfırlama bağlantısı geçersiz. Lütfen e-postanızdaki bağlantıyı kullanın.
+              </Uyari>
+            )}
 
             {basariMesaji ? (
               <Uyari tur="basari">{basariMesaji} Giriş sayfasına yönlendiriliyorsunuz...</Uyari>
             ) : (
               token && (
-                <form onSubmit={handleSubmit(gonder)} className="space-y-4">
+                <form onSubmit={handleSubmit(gonder)} className="space-y-4" noValidate>
                   {sunucuHatasi && <Uyari tur="hata">{sunucuHatasi}</Uyari>}
 
                   <div>
                     <Etiket htmlFor="yeniSifre">Yeni Şifre</Etiket>
-                    <Girdi id="yeniSifre" type="password" placeholder="••••••••" {...register("yeniSifre")} />
+                    <Girdi
+                      id="yeniSifre"
+                      type="password"
+                      placeholder="••••••••"
+                      hataliMi={!!errors.yeniSifre}
+                      {...register("yeniSifre")}
+                    />
                     {errors.yeniSifre && <p className="mt-1 text-xs text-tehlike">{errors.yeniSifre.message}</p>}
                   </div>
 
                   <div>
                     <Etiket htmlFor="yeniSifreTekrar">Yeni Şifre Tekrar</Etiket>
-                    <Girdi id="yeniSifreTekrar" type="password" placeholder="••••••••" {...register("yeniSifreTekrar")} />
+                    <Girdi
+                      id="yeniSifreTekrar"
+                      type="password"
+                      placeholder="••••••••"
+                      hataliMi={!!errors.yeniSifreTekrar}
+                      {...register("yeniSifreTekrar")}
+                    />
                     {errors.yeniSifreTekrar && (
                       <p className="mt-1 text-xs text-tehlike">{errors.yeniSifreTekrar.message}</p>
                     )}
                   </div>
 
-                  <Dugme type="submit" varyant="birincil" boyut="buyuk" className="w-full" disabled={gonderiliyor}>
-                    {gonderiliyor ? "Kaydediliyor..." : "Şifreyi Güncelle"}
+                  <Dugme
+                    type="submit"
+                    varyant="birincil"
+                    boyut="buyuk"
+                    className="w-full"
+                    yukleniyorMu={gonderiliyor}
+                    yukleniyorMetni="Kaydediliyor..."
+                  >
+                    Şifreyi Güncelle
                   </Dugme>
                 </form>
               )
@@ -109,7 +134,7 @@ function SifreSifirlaFormu_() {
 export default function SifreSifirlaSayfasi() {
   return (
     <Suspense fallback={<TamSayfaYukleniyor />}>
-      <SifreSifirlaFormu_ />
+      <SifreSifirlaIcerik />
     </Suspense>
   );
 }

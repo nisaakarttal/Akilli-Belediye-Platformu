@@ -8,11 +8,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-import { AiOneriKarti } from "@/components/sikayet/ai-oneri-karti";
-import { dosyaTuruTahminEt, DosyaSecici } from "@/components/sikayet/dosya-yukleme";
 import { Altbilgi } from "@/components/layout/altbilgi";
 import { Basli } from "@/components/layout/basli";
 import { KorumaliRota } from "@/components/layout/korumali-rota";
+import { AiOneriKarti } from "@/components/sikayet/ai-oneri-karti";
+import { DosyaSecici, dosyaTuruTahminEt } from "@/components/sikayet/dosya-yukleme";
 import { Dugme } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { Girdi } from "@/components/ui/input";
@@ -27,13 +27,13 @@ import { taleplerApi } from "@/lib/api/talepler";
 import { type TalepOlusturFormu, talepOlusturSemasi } from "@/lib/validasyon";
 import type { AnalizYaniti, TalepOnceligi } from "@/types";
 
-// 🌐 Harita bileşenini SSR kapalı olarak dinamik import ediyoruz (Harita çakışmasını engeller)
+// Harita bileşenini SSR kapalı olarak dinamik yükle (harita çakışmasını engeller)
 const HaritaSecici = dynamic(
   () => import("@/components/harita/harita-secici").then((mod) => mod.HaritaSecici),
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 w-full animate-pulse rounded-lg bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+      <div className="flex h-64 w-full animate-pulse items-center justify-center rounded-xl bg-black/5 text-sm text-metin-ikincil dark:bg-white/5">
         Harita yükleniyor...
       </div>
     ),
@@ -41,6 +41,8 @@ const HaritaSecici = dynamic(
 );
 
 const KAPAKLI_MERKEZ = { enlem: 41.3706, boylam: 27.9917 };
+const AI_ANALIZ_MIN_BASLIK_UZUNLUGU = 5;
+const AI_ANALIZ_MIN_ACIKLAMA_UZUNLUGU = 10;
 
 function SikayetOlusturIcerik() {
   const router = useRouter();
@@ -71,7 +73,12 @@ function SikayetOlusturIcerik() {
   const aciklama = watch("aciklama");
 
   async function aiIleAnalizEt() {
-    if (!baslik || !aciklama || baslik.length < 5 || aciklama.length < 10) {
+    if (
+      !baslik ||
+      !aciklama ||
+      baslik.length < AI_ANALIZ_MIN_BASLIK_UZUNLUGU ||
+      aciklama.length < AI_ANALIZ_MIN_ACIKLAMA_UZUNLUGU
+    ) {
       setSunucuHatasi("Yapay zekâ analizi için önce başlık ve açıklamayı doldurunuz.");
       return;
     }
@@ -142,10 +149,15 @@ function SikayetOlusturIcerik() {
           <KartIcerik className="space-y-5">
             {sunucuHatasi && <Uyari tur="hata">{sunucuHatasi}</Uyari>}
 
-            <form onSubmit={handleSubmit(gonder)} className="space-y-5">
+            <form onSubmit={handleSubmit(gonder)} className="space-y-5" noValidate>
               <div>
                 <Etiket htmlFor="baslik">Başlık</Etiket>
-                <Girdi id="baslik" placeholder="Örn: Sokak lambası yanmıyor" {...register("baslik")} />
+                <Girdi
+                  id="baslik"
+                  placeholder="Örn: Sokak lambası yanmıyor"
+                  hataliMi={!!errors.baslik}
+                  {...register("baslik")}
+                />
                 {errors.baslik && <p className="mt-1 text-xs text-tehlike">{errors.baslik.message}</p>}
               </div>
 
@@ -154,6 +166,7 @@ function SikayetOlusturIcerik() {
                 <MetinAlani
                   id="aciklama"
                   placeholder="Sorunu detaylı bir şekilde açıklayınız..."
+                  hataliMi={!!errors.aciklama}
                   {...register("aciklama")}
                 />
                 {errors.aciklama && <p className="mt-1 text-xs text-tehlike">{errors.aciklama.message}</p>}
@@ -164,11 +177,12 @@ function SikayetOlusturIcerik() {
                 varyant="cam"
                 boyut="kucuk"
                 onClick={aiIleAnalizEt}
-                disabled={aiAnalizEdiliyor}
+                yukleniyorMu={aiAnalizEdiliyor}
+                yukleniyorMetni="Analiz Ediliyor..."
                 className="gap-2"
               >
                 <Sparkles size={16} />
-                {aiAnalizEdiliyor ? "Analiz Ediliyor..." : "Yapay Zekâ ile Analiz Et"}
+                Yapay Zekâ ile Analiz Et
               </Dugme>
 
               {aiSonucu && <AiOneriKarti analiz={aiSonucu} uygulandiMi={aiOneriUygulandi} onUygula={oneriyiUygula} />}
@@ -176,7 +190,7 @@ function SikayetOlusturIcerik() {
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
                   <Etiket htmlFor="kategori_id">Kategori</Etiket>
-                  <Secim id="kategori_id" {...register("kategori_id")}>
+                  <Secim id="kategori_id" hataliMi={!!errors.kategori_id} {...register("kategori_id")}>
                     <option value="">Kategori seçiniz</option>
                     {kategoriler?.map((k) => (
                       <option key={k.id} value={k.id}>
@@ -200,7 +214,7 @@ function SikayetOlusturIcerik() {
 
               <div>
                 <Etiket htmlFor="mahalle_id">Mahalle</Etiket>
-                <Secim id="mahalle_id" {...register("mahalle_id")}>
+                <Secim id="mahalle_id" hataliMi={!!errors.mahalle_id} {...register("mahalle_id")}>
                   <option value="">Mahalle seçiniz</option>
                   {mahalleler?.map((m) => (
                     <option key={m.id} value={m.id}>
@@ -230,8 +244,15 @@ function SikayetOlusturIcerik() {
                 <DosyaSecici dosyalar={dosyalar} onDegistir={setDosyalar} />
               </div>
 
-              <Dugme type="submit" varyant="birincil" boyut="buyuk" className="w-full" disabled={gonderiliyor}>
-                {gonderiliyor ? "Gönderiliyor..." : "Talebi Gönder"}
+              <Dugme
+                type="submit"
+                varyant="birincil"
+                boyut="buyuk"
+                className="w-full"
+                yukleniyorMu={gonderiliyor}
+                yukleniyorMetni="Gönderiliyor..."
+              >
+                Talebi Gönder
               </Dugme>
             </form>
           </KartIcerik>

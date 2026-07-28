@@ -10,8 +10,6 @@ import {
   Sparkles,
   Clock,
   CheckCircle2,
-  AlertCircle,
-  XCircle,
   UserCheck,
   Tag,
   Calendar,
@@ -172,7 +170,7 @@ function AdminTaleplerIcerik() {
           boyut="kucuk"
           onClick={() => refetch()}
           disabled={isRefetching}
-          className="self-start gap-2 bg-beyaz border-indigo-200 text-indigo-600 hover:bg-indigo-50 shadow-sm sm:self-auto"
+          className="self-start gap-2 bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-50 shadow-sm sm:self-auto"
         >
           <RefreshCw size={14} className={isRefetching ? "animate-spin" : ""} />
           <span>Talepleri Yenile</span>
@@ -187,7 +185,7 @@ function AdminTaleplerIcerik() {
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-500" />
             <Girdi
               placeholder="Takip no, başlık, mahalle veya kategori ara..."
-              className="pl-9 bg-beyaz border-indigo-100 focus:border-indigo-400 focus:ring-indigo-200 text-sm"
+              className="pl-9 bg-white border-indigo-100 focus:border-indigo-400 focus:ring-indigo-200 text-sm"
               value={arama}
               onChange={(e) => setArama(e.target.value)}
             />
@@ -198,7 +196,7 @@ function AdminTaleplerIcerik() {
             <Secim
               value={durumFiltresi}
               onChange={(e) => setDurumFiltresi(e.target.value as TalepDurumu | "")}
-              className="bg-beyaz border-indigo-100 focus:border-indigo-400 text-sm font-medium"
+              className="bg-white border-indigo-100 focus:border-indigo-400 text-sm font-medium"
             >
               {DURUM_SECENEKLERI.map((secenek) => (
                 <option key={secenek.deger} value={secenek.deger}>
@@ -221,7 +219,7 @@ function AdminTaleplerIcerik() {
               className={`px-3 py-1 text-xs font-bold rounded-full transition-all ${
                 durumFiltresi === secenek.deger
                   ? "bg-indigo-600 text-white shadow-xs"
-                  : "bg-beyaz text-indigo-950 border border-indigo-100 hover:bg-indigo-50"
+                  : "bg-white text-indigo-950 border border-indigo-100 hover:bg-indigo-50"
               }`}
             >
               {secenek.etiket}
@@ -239,7 +237,7 @@ function AdminTaleplerIcerik() {
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-600 mb-3">
               <FileQuestion size={32} />
             </div>
-            <p className="text-base font-bold text-metin-birincil">Gösterilecek Talep Bulunamadı</p>
+            <p className="text-base font-bold text-metin">Gösterilecek Talep Bulunamadı</p>
             <p className="mt-1 text-xs text-metin-ikincil max-w-sm">
               Seçtiğiniz filtreler veya arama terimleri ile eşleşen kayıt bulunamadı. Filtreleri temizlemeyi deneyebilirsiniz.
             </p>
@@ -257,7 +255,7 @@ function AdminTaleplerIcerik() {
                 exit={{ opacity: 0, scale: 0.98 }}
               >
                 <Link href={`/admin/talepler/${talep.id}`} className="block group">
-                  <Kart className="relative overflow-hidden border border-indigo-100/80 bg-beyaz shadow-xs transition-all duration-200 hover:border-indigo-300 hover:shadow-md">
+                  <Kart className="relative overflow-hidden border border-indigo-100/80 bg-white shadow-xs transition-all duration-200 hover:border-indigo-300 hover:shadow-md">
                     {/* Durum Bazlı Sol Vurgu Çizgisi */}
                     <div
                       className={`absolute left-0 top-0 h-full w-1.5 transition-all group-hover:w-2 ${
@@ -278,7 +276,7 @@ function AdminTaleplerIcerik() {
                           </span>
                         </div>
 
-                        <h3 className="font-extrabold text-metin-birincil text-base group-hover:text-indigo-600 transition-colors">
+                        <h3 className="font-extrabold text-metin text-base group-hover:text-indigo-600 transition-colors">
                           {talep.baslik}
                         </h3>
 

@@ -4,12 +4,15 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useRef, useState } from "react";
 
-import { DurumRozeti } from "@/components/sikayet/durum-rozeti";
-import type { TalepHaritaNoktasi } from "@/types";
+import type { TalepDurumu, TalepHaritaNoktasi } from "@/types";
 
 const KAPAKLI_MERKEZ: [number, number] = [41.3706, 27.9917];
+const VARSAYILAN_YUKSEKLIK = 500;
+const NOKTA_BOYUTU = 16;
+const NOKTA_YARICAP = 8;
+const BASLANGIC_YAKINLASTIRMA = 13;
 
-const DURUM_RENGI: Record<string, string> = {
+const DURUM_RENGI: Record<TalepDurumu, string> = {
   bekliyor: "#64748B",
   inceleniyor: "#F59E0B",
   atandi: "#0EA5E9",
@@ -17,18 +20,28 @@ const DURUM_RENGI: Record<string, string> = {
   kapatildi: "#94A3B8",
 };
 
-function nokta_ikonu(durum: string) {
+/** Leaflet, aynı DOM elemanına ikinci kez harita bağlanmaya çalışırsa hata fırlatır; bu iç işaretleyiciyi kontrol ederiz. */
+interface LeafletBagliKonteyner extends HTMLDivElement {
+  _leaflet_id?: number;
+}
+
+function noktaIkonuOlustur(durum: TalepDurumu): L.DivIcon {
   const renk = DURUM_RENGI[durum] ?? "#2563EB";
   return L.divIcon({
     className: "",
-    html: `<div style="width:16px;height:16px;border-radius:9999px;background:${renk};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8],
+    html: `<div style="width:${NOKTA_BOYUTU}px;height:${NOKTA_BOYUTU}px;border-radius:9999px;background:${renk};border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4)"></div>`,
+    iconSize: [NOKTA_BOYUTU, NOKTA_BOYUTU],
+    iconAnchor: [NOKTA_YARICAP, NOKTA_YARICAP],
   });
 }
 
-export function TalepHaritasi({ noktalar, yukseklik = 500 }: { noktalar: TalepHaritaNoktasi[]; yukseklik?: number }) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+interface TalepHaritasiProps {
+  noktalar: TalepHaritaNoktasi[];
+  yukseklik?: number;
+}
+
+export function TalepHaritasi({ noktalar, yukseklik = VARSAYILAN_YUKSEKLIK }: TalepHaritasiProps) {
+  const containerRef = useRef<LeafletBagliKonteyner | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
 
@@ -38,17 +51,16 @@ export function TalepHaritasi({ noktalar, yukseklik = 500 }: { noktalar: TalepHa
     setMonteEdildi(true);
   }, []);
 
-  // 1. Haritanın İlk Kurulumu ve Silinmesi (Lifecycle)
+  // Haritanın ilk kurulumu ve unmount'ta temizlenmesi
   useEffect(() => {
     if (!monteEdildi || !containerRef.current) return;
 
-    // Konteynerde kalıntı varsa temizle
-    if ((containerRef.current as any)._leaflet_id) {
+    // Konteynerde önceki bir Leaflet örneğinden kalıntı varsa temizle
+    if (containerRef.current._leaflet_id) {
       containerRef.current.innerHTML = "";
     }
 
-    // Haritayı İlklendir
-    const map = L.map(containerRef.current).setView(KAPAKLI_MERKEZ, 13);
+    const map = L.map(containerRef.current).setView(KAPAKLI_MERKEZ, BASLANGIC_YAKINLASTIRMA);
     mapRef.current = map;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -56,35 +68,28 @@ export function TalepHaritasi({ noktalar, yukseklik = 500 }: { noktalar: TalepHa
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıda bulunanlar',
     }).addTo(map);
 
-    // Marker'ları tutacak grup katmanı oluştur
     const layerGroup = L.layerGroup().addTo(map);
     layerGroupRef.current = layerGroup;
 
-    // 🪄 SİHİRLİ TEMİZLİK: Unmount anında harita yok edilir!
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
+      mapRef.current?.remove();
+      mapRef.current = null;
     };
   }, [monteEdildi]);
 
-  // 2. Filtre veya Noktalar Değiştikçe Marker'ları Güncelle
+  // Noktalar değiştikçe marker'ları güncelle
   useEffect(() => {
     if (!mapRef.current || !layerGroupRef.current) return;
 
-    // Önceki işaretçileri temizle
     layerGroupRef.current.clearLayers();
 
-    // Yeni noktaları ekle
     noktalar.forEach((nokta) => {
       if (!nokta.enlem || !nokta.boylam) return;
 
       const marker = L.marker([nokta.enlem, nokta.boylam], {
-        icon: nokta_ikonu(nokta.durum),
+        icon: noktaIkonuOlustur(nokta.durum),
       });
 
-      // Popup içeriği
       const popupIcerik = `
         <div style="font-family: inherit; font-size: 13px; line-height: 1.4;">
           <p style="font-weight: 600; margin: 0 0 4px 0;">${nokta.baslik}</p>
@@ -98,7 +103,14 @@ export function TalepHaritasi({ noktalar, yukseklik = 500 }: { noktalar: TalepHa
   }, [noktalar]);
 
   if (!monteEdildi) {
-    return <div style={{ height: yukseklik }} className="animate-pulse rounded-xl bg-black/5 dark:bg-white/5" />;
+    return (
+      <div
+        style={{ height: yukseklik }}
+        className="animate-pulse rounded-xl bg-black/5 dark:bg-white/5"
+        role="status"
+        aria-label="Harita yükleniyor"
+      />
+    );
   }
 
   return (

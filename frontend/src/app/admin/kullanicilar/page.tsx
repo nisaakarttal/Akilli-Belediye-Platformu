@@ -194,7 +194,7 @@ export default function YoneticiKullanicilarSayfasi() {
           boyut="kucuk"
           onClick={() => refetch()}
           disabled={isRefetching}
-          className="self-start gap-2 bg-beyaz border-indigo-200 text-indigo-600 hover:bg-indigo-50 shadow-sm sm:self-auto"
+          className="self-start gap-2 bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-50 shadow-sm sm:self-auto"
         >
           <RefreshCw size={14} className={isRefetching ? "animate-spin" : ""} />
           <span>Listeyi Yenile</span>
@@ -221,14 +221,14 @@ export default function YoneticiKullanicilarSayfasi() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-500" />
           <Girdi
             placeholder="Ad, soyad veya e-posta ile ara..."
-            className="pl-9 bg-beyaz border-indigo-100 focus:border-indigo-400 focus:ring-indigo-200 text-sm"
+            className="pl-9 bg-white border-indigo-100 focus:border-indigo-400 focus:ring-indigo-200 text-sm"
             value={arama}
             onChange={(e) => setArama(e.target.value)}
           />
           {arama && (
             <button
               onClick={() => setArama("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-metin-ikincil hover:text-metin-birincil"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-metin-ikincil hover:text-metin"
             >
               <X size={14} />
             </button>
@@ -239,7 +239,7 @@ export default function YoneticiKullanicilarSayfasi() {
           <Secim
             value={rolFiltresi}
             onChange={(e) => setRolFiltresi(e.target.value as KullaniciRolu | "")}
-            className="bg-beyaz border-indigo-100 focus:border-indigo-400 text-sm font-medium"
+            className="bg-white border-indigo-100 focus:border-indigo-400 text-sm font-medium"
           >
             <option value="">Tüm Roller</option>
             <option value="vatandas">Vatandaş</option>
@@ -275,7 +275,7 @@ export default function YoneticiKullanicilarSayfasi() {
                     className={`relative overflow-hidden border transition-all duration-200 ${
                       !kullanici.aktif_mi
                         ? "border-rose-200 bg-rose-50/30 opacity-80"
-                        : "border-indigo-100/80 bg-beyaz hover:border-indigo-300 hover:shadow-md"
+                        : "border-indigo-100/80 bg-white hover:border-indigo-300 hover:shadow-md"
                     }`}
                   >
                     {/* Sol Renkli Vurgu Çubuğu */}
@@ -311,7 +311,7 @@ export default function YoneticiKullanicilarSayfasi() {
 
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
-                            <p className="font-extrabold text-metin-birincil text-base">
+                            <p className="font-extrabold text-metin text-base">
                               {kullanici.ad} {kullanici.soyad}
                             </p>
 
@@ -417,7 +417,7 @@ export default function YoneticiKullanicilarSayfasi() {
             <Kart className="border border-dashed border-indigo-200 bg-indigo-50/30">
               <KartIcerik className="py-12 text-center">
                 <Users size={32} className="mx-auto text-indigo-300" />
-                <p className="mt-2 text-sm font-semibold text-metin-birincil">
+                <p className="mt-2 text-sm font-semibold text-metin">
                   Eşleşen kullanıcı bulunamadı.
                 </p>
                 <p className="mt-1 text-xs text-metin-ikincil">

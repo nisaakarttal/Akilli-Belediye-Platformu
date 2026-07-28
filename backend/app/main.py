@@ -22,10 +22,63 @@ from app.api.v1 import (
 from app.core.config import get_settings
 from app.core.limiter import limiter
 
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 load_dotenv()
 
 ayarlar = get_settings()
+
+# ==========================
+# SECURITY HEADERS
+# ==========================
+
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next
+    ) -> Response:
+
+        response = await call_next(request)
+
+        # Tarayıcı MIME tahmini yapmasın
+        response.headers["X-Content-Type-Options"] = "nosniff"
+
+        # Clickjacking koruması
+        response.headers["X-Frame-Options"] = "DENY"
+
+        # Referrer bilgisi azaltma
+        response.headers["Referrer-Policy"] = (
+            "strict-origin-when-cross-origin"
+        )
+
+        # Kamera, mikrofon vb erişimlerini kapatma
+        response.headers["Permissions-Policy"] = (
+            "camera=(), microphone=(), geolocation=()"
+        )
+
+        # HTTPS zorlaması
+        if ayarlar.ENVIRONMENT == "production":
+            response.headers["Strict-Transport-Security"] = (
+                "max-age=31536000; includeSubDomains; preload"
+            )
+
+        # Content Security Policy
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "img-src 'self' data: https:; "
+            "style-src 'self' 'unsafe-inline'; "
+            "script-src 'self' 'unsafe-inline'; "
+            "connect-src 'self' https:; "
+            "font-src 'self' https:;"
+        )
+
+        return response
 
 
 app = FastAPI(
@@ -48,7 +101,29 @@ app.add_exception_handler(
     _rate_limit_exceeded_handler
 )
 
+# ==========================
+# SECURITY
+# ==========================
 
+app.add_middleware(
+    SecurityHeadersMiddleware
+)
+
+if ayarlar.ENVIRONMENT == "production":
+
+    app.add_middleware(
+        HTTPSRedirectMiddleware
+    )
+
+if ayarlar.ENVIRONMENT == "production":
+
+    app.add_middleware(
+        TrustedHostMiddleware,
+        allowed_hosts=[
+            "api.kapakli.bel.tr",
+            "*.kapakli.bel.tr"
+        ]
+    )
 # ==========================
 # CORS
 # ==========================
