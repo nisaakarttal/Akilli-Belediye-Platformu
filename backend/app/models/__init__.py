@@ -16,6 +16,8 @@ from app.models.bildirim import Bildirim, BildirimTuru
 from app.models.ai_kaydi import AiKaydi
 from app.models.aktivite_kaydi import AktiviteKaydi
 from .refresh_token import RefreshToken
+from .refresh_token import RefreshToken
+from .login_log import LoginLog
 
 __all__ = [
     "Kullanici",
@@ -34,5 +36,6 @@ __all__ = [
     "BildirimTuru",
     "AiKaydi",
     "AktiviteKaydi",
+    "RefreshToken",
+    "LoginLog",
 ]
-
