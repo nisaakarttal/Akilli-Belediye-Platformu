@@ -42,6 +42,38 @@ Bilgi İşlem Müdürlüğü
 
     _smtp_ile_gonder(alici_eposta, konu, icerik)
 
+def email_dogrulama_epostasi_gonder(
+    alici_eposta: str,
+    alici_ad: str,
+    dogrulama_baglantisi: str,
+) -> None:
+    konu = "Kapaklı Akıllı Belediye Platformu - Email Doğrulama"
+
+    icerik = f"""
+Sayın {alici_ad},
+
+Kapaklı Akıllı Belediye Platformu hesabınızı aktif hale getirmek için
+aşağıdaki bağlantıya tıklayarak email adresinizi doğrulayınız.
+
+Doğrulama bağlantısı:
+
+{dogrulama_baglantisi}
+
+Bu bağlantı 24 saat boyunca geçerlidir.
+
+Eğer bu işlemi siz gerçekleştirmediyseniz bu e-postayı dikkate almayabilirsiniz.
+
+İyi günler dileriz.
+
+Kapaklı Belediyesi
+Bilgi İşlem Müdürlüğü
+"""
+
+    _smtp_ile_gonder(
+        alici_eposta,
+        konu,
+        icerik
+    )
 
 def hos_geldin_epostasi_gonder(
     alici_eposta: str,
