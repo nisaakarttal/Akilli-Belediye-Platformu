@@ -1,23 +1,25 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import { KeyRound, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { KimlikKarti } from "@/components/layout/kimlik-karti";
 import { Dugme } from "@/components/ui/button";
-import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
-import { Girdi } from "@/components/ui/input";
-import { Etiket } from "@/components/ui/label";
+import { FormAlani } from "@/components/ui/form-alani";
+import { SifreGirdisi } from "@/components/ui/sifre-girdisi";
 import { Uyari } from "@/components/ui/uyari";
 import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
 import { apiHataMesaji } from "@/lib/api";
 import { authApi } from "@/lib/api/auth";
 import { type SifreSifirlaFormu, sifreSifirlaSemasi } from "@/lib/validasyon";
 
-const GIRIS_YONLENDIRME_GECIKMESI_MS = 2000;
+/** Başarılı sıfırlamadan sonra giriş sayfasına yönlendirilene kadar geçen süre (ms). */
+const YONLENDIRME_GECIKMESI_MS = 2000;
 
 function SifreSifirlaIcerik() {
   const router = useRouter();
@@ -44,7 +46,7 @@ function SifreSifirlaIcerik() {
     try {
       const yanit = await authApi.sifreSifirla(token, veri.yeniSifre);
       setBasariMesaji(yanit.mesaj);
-      setTimeout(() => router.push("/giris"), GIRIS_YONLENDIRME_GECIKMESI_MS);
+      setTimeout(() => router.push("/giris"), YONLENDIRME_GECIKMESI_MS);
     } catch (hata) {
       setSunucuHatasi(apiHataMesaji(hata, "Şifre sıfırlanamadı. Bağlantının süresi dolmuş olabilir."));
     } finally {
@@ -53,81 +55,67 @@ function SifreSifirlaIcerik() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="w-full max-w-md"
-      >
-        <Kart>
-          <KartBasligi className="text-center">
-            <KartBaslik>Yeni Şifre Belirle</KartBaslik>
-            <p className="text-sm text-metin-ikincil">Hesabınız için yeni bir şifre oluşturun.</p>
-          </KartBasligi>
-          <KartIcerik>
-            {!token && (
-              <Uyari tur="hata">
-                Sıfırlama bağlantısı geçersiz. Lütfen e-postanızdaki bağlantıyı kullanın.
-              </Uyari>
-            )}
+    <KimlikKarti
+      ikon={KeyRound}
+      baslik="Yeni Şifre Belirle"
+      aciklama="Hesabınız için yeni bir şifre oluşturun."
+      altBilgi={
+        <Link href="/giris" className="font-semibold text-birincil-600 hover:underline">
+          Giriş sayfasına dön
+        </Link>
+      }
+    >
+      {!token && (
+        <Uyari tur="hata">Sıfırlama bağlantısı geçersiz. Lütfen e-postanızdaki bağlantıyı kullanın.</Uyari>
+      )}
 
-            {basariMesaji ? (
-              <Uyari tur="basari">{basariMesaji} Giriş sayfasına yönlendiriliyorsunuz...</Uyari>
-            ) : (
-              token && (
-                <form onSubmit={handleSubmit(gonder)} className="space-y-4" noValidate>
-                  {sunucuHatasi && <Uyari tur="hata">{sunucuHatasi}</Uyari>}
+      {basariMesaji ? (
+        <Uyari tur="basari">{basariMesaji} Giriş sayfasına yönlendiriliyorsunuz...</Uyari>
+      ) : (
+        token && (
+          <form onSubmit={handleSubmit(gonder)} className="space-y-4">
+            <AnimatePresence initial={false}>
+              {sunucuHatasi && (
+                <motion.div
+                  key="sunucu-hatasi"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <Uyari tur="hata">{sunucuHatasi}</Uyari>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-                  <div>
-                    <Etiket htmlFor="yeniSifre">Yeni Şifre</Etiket>
-                    <Girdi
-                      id="yeniSifre"
-                      type="password"
-                      placeholder="••••••••"
-                      hataliMi={!!errors.yeniSifre}
-                      {...register("yeniSifre")}
-                    />
-                    {errors.yeniSifre && <p className="mt-1 text-xs text-tehlike">{errors.yeniSifre.message}</p>}
-                  </div>
+            <FormAlani id="yeniSifre" etiket="Yeni Şifre" hata={errors.yeniSifre?.message}>
+              <SifreGirdisi
+                id="yeniSifre"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                aria-invalid={!!errors.yeniSifre}
+                {...register("yeniSifre")}
+              />
+            </FormAlani>
 
-                  <div>
-                    <Etiket htmlFor="yeniSifreTekrar">Yeni Şifre Tekrar</Etiket>
-                    <Girdi
-                      id="yeniSifreTekrar"
-                      type="password"
-                      placeholder="••••••••"
-                      hataliMi={!!errors.yeniSifreTekrar}
-                      {...register("yeniSifreTekrar")}
-                    />
-                    {errors.yeniSifreTekrar && (
-                      <p className="mt-1 text-xs text-tehlike">{errors.yeniSifreTekrar.message}</p>
-                    )}
-                  </div>
+            <FormAlani id="yeniSifreTekrar" etiket="Yeni Şifre Tekrar" hata={errors.yeniSifreTekrar?.message}>
+              <SifreGirdisi
+                id="yeniSifreTekrar"
+                autoComplete="new-password"
+                placeholder="••••••••"
+                aria-invalid={!!errors.yeniSifreTekrar}
+                {...register("yeniSifreTekrar")}
+              />
+            </FormAlani>
 
-                  <Dugme
-                    type="submit"
-                    varyant="birincil"
-                    boyut="buyuk"
-                    className="w-full"
-                    yukleniyorMu={gonderiliyor}
-                    yukleniyorMetni="Kaydediliyor..."
-                  >
-                    Şifreyi Güncelle
-                  </Dugme>
-                </form>
-              )
-            )}
-
-            <p className="mt-6 text-center text-sm text-metin-ikincil">
-              <Link href="/giris" className="font-medium text-birincil-600 hover:underline">
-                Giriş sayfasına dön
-              </Link>
-            </p>
-          </KartIcerik>
-        </Kart>
-      </motion.div>
-    </div>
+            <Dugme type="submit" varyant="birincil" boyut="buyuk" className="w-full gap-2" disabled={gonderiliyor}>
+              {gonderiliyor && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
+              {gonderiliyor ? "Kaydediliyor..." : "Şifreyi Güncelle"}
+            </Dugme>
+          </form>
+        )
+      )}
+    </KimlikKarti>
   );
 }
 

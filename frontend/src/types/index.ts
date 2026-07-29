@@ -1,4 +1,4 @@
-// Backend `app/models` ve `app/schemas` ile birebir uyumlu tip tanımları.
+// Backend `app/models` ve `app/schemas` ile birebir uyumlu master tip tanımları.
 
 export type KullaniciRolu = "vatandas" | "personel" | "admin";
 
@@ -14,6 +14,7 @@ export interface Kullanici {
   departman: string | null;
   aktif_mi: boolean;
   olusturulma_tarihi: string;
+  guncellenme_tarihi?: string;
 }
 
 export interface TokenYaniti {
@@ -30,6 +31,7 @@ export interface Kategori {
   ikon: string | null;
   sorumlu_departman: string;
   renk: string;
+  aktif_mi?: boolean;
 }
 
 export interface Ilce {
@@ -66,6 +68,7 @@ export interface DurumGecmisiKaydi {
   onceki_durum: TalepDurumu | null;
   yeni_durum: TalepDurumu;
   aciklama: string | null;
+  olusturan_kullanici?: { id: string; ad: string; soyad: string };
   olusturulma_tarihi: string;
 }
 
@@ -78,11 +81,10 @@ export interface TalepListe {
   kategori: Kategori;
   mahalle: Mahalle;
   olusturulma_tarihi: string;
-
   atanan_personel_id: string | null;
 }
 
-export interface TalepDetay extends Omit<TalepListe, never> {
+export interface TalepDetay extends TalepListe {
   aciklama: string;
   adres_detay: string | null;
   enlem: number;
@@ -142,5 +144,5 @@ export interface AnalizYaniti {
 }
 
 export interface ApiHata {
-  detail: string;
+  detail: string | { loc: (string | number)[]; msg: string; type: string }[];
 }

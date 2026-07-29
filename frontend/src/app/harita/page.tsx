@@ -9,36 +9,22 @@ import { Basli } from "@/components/layout/basli";
 import { Kart, KartIcerik } from "@/components/ui/card";
 import { Etiket } from "@/components/ui/label";
 import { Secim } from "@/components/ui/select";
+import { DURUM_SECENEKLERI } from "@/constants/talep";
 import { kategorilerApi } from "@/lib/api/konum";
 import { taleplerApi } from "@/lib/api/talepler";
 import type { TalepDurumu } from "@/types";
 
-const HARITA_YUKSEKLIGI = 560;
-
-// Harita bileşenini SSR kapalı olacak şekilde dinamik yükle
 const TalepHaritasi = dynamic(
   () => import("@/components/harita/talep-haritasi").then((mod) => mod.TalepHaritasi),
   {
     ssr: false,
     loading: () => (
-      <div
-        style={{ height: HARITA_YUKSEKLIGI }}
-        className="flex w-full animate-pulse items-center justify-center rounded-xl bg-black/5 text-sm text-metin-ikincil dark:bg-white/5"
-      >
+      <div className="flex h-[560px] w-full animate-pulse items-center justify-center rounded-lg bg-black/5 text-sm text-metin-ikincil dark:bg-white/5">
         Harita yükleniyor...
       </div>
     ),
   }
 );
-
-const DURUM_SECENEKLERI: { deger: TalepDurumu | ""; etiket: string }[] = [
-  { deger: "", etiket: "Tüm Durumlar" },
-  { deger: "bekliyor", etiket: "Bekliyor" },
-  { deger: "inceleniyor", etiket: "İnceleniyor" },
-  { deger: "atandi", etiket: "Atandı" },
-  { deger: "cozuldu", etiket: "Çözüldü" },
-  { deger: "kapatildi", etiket: "Kapatıldı" },
-];
 
 export default function HaritaSayfasi() {
   const [durum, setDurum] = useState<TalepDurumu | "">("");
@@ -67,11 +53,7 @@ export default function HaritaSayfasi() {
           <KartIcerik className="flex flex-wrap gap-4 pt-6">
             <div className="min-w-[180px] flex-1">
               <Etiket htmlFor="durum-filtre">Durum</Etiket>
-              <Secim
-                id="durum-filtre"
-                value={durum}
-                onChange={(e) => setDurum(e.target.value as TalepDurumu | "")}
-              >
+              <Secim id="durum-filtre" value={durum} onChange={(e) => setDurum(e.target.value as TalepDurumu | "")}>
                 {DURUM_SECENEKLERI.map((s) => (
                   <option key={s.deger} value={s.deger}>
                     {s.etiket}
@@ -93,13 +75,9 @@ export default function HaritaSayfasi() {
           </KartIcerik>
         </Kart>
 
-        {!isLoading && noktalar && (
-          <p className="mb-3 text-sm text-metin-ikincil" role="status">
-            {noktalar.length} talep bulundu.
-          </p>
-        )}
+        {!isLoading && noktalar && <p className="mb-3 text-sm text-metin-ikincil">{noktalar.length} talep bulundu.</p>}
 
-        <TalepHaritasi noktalar={noktalar ?? []} yukseklik={HARITA_YUKSEKLIGI} />
+        <TalepHaritasi noktalar={noktalar ?? []} yukseklik={560} />
       </main>
       <Altbilgi />
     </>

@@ -2,17 +2,12 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { ClipboardList } from "lucide-react";
-import Link from "next/link";
 
-import { DurumRozeti } from "@/components/sikayet/durum-rozeti";
-import { OncelikRozeti } from "@/components/sikayet/oncelik-rozeti";
+import { TalepKarti } from "@/components/sikayet/talep-karti";
 import { Kart, KartIcerik } from "@/components/ui/card";
+import { FadeIn, FadeInStagger, StaggerOgesi } from "@/components/ui/animasyon";
 import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
 import { personelApi } from "@/lib/api/personel";
-
-function tarihiBicimlendir(isoTarih: string) {
-  return new Date(isoTarih).toLocaleDateString("tr-TR", { day: "numeric", month: "long", year: "numeric" });
-}
 
 export default function PersonelAnaSayfasi() {
   const { data, isLoading } = useQuery({ queryKey: ["atanan-talepler"], queryFn: personelApi.atananTalepler });
@@ -27,34 +22,22 @@ export default function PersonelAnaSayfasi() {
       {isLoading ? (
         <TamSayfaYukleniyor />
       ) : !data || data.length === 0 ? (
-        <Kart>
-          <KartIcerik className="flex flex-col items-center gap-3 py-12 text-center">
-            <ClipboardList size={40} className="text-metin-ikincil" />
-            <p className="text-metin-ikincil">Şu anda size atanmış bir talep bulunmuyor.</p>
-          </KartIcerik>
-        </Kart>
+        <FadeIn>
+          <Kart>
+            <KartIcerik className="flex flex-col items-center gap-3 py-12 text-center">
+              <ClipboardList size={40} className="text-metin-ikincil" aria-hidden="true" />
+              <p className="text-metin-ikincil">Şu anda size atanmış bir talep bulunmuyor.</p>
+            </KartIcerik>
+          </Kart>
+        </FadeIn>
       ) : (
-        <div className="space-y-3">
+        <FadeInStagger className="space-y-3">
           {data.map((talep) => (
-            <Link key={talep.id} href={`/personel/${talep.id}`}>
-              <Kart className="transition-transform hover:-translate-y-0.5">
-                <KartIcerik className="flex flex-wrap items-center justify-between gap-3 pt-6">
-                  <div>
-                    <p className="text-xs text-metin-ikincil">{talep.takip_no}</p>
-                    <h3 className="font-semibold text-metin">{talep.baslik}</h3>
-                    <p className="mt-1 text-xs text-metin-ikincil">
-                      {talep.kategori.ad} • {talep.mahalle.ad} • {tarihiBicimlendir(talep.olusturulma_tarihi)}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <DurumRozeti durum={talep.durum} />
-                    <OncelikRozeti oncelik={talep.oncelik} />
-                  </div>
-                </KartIcerik>
-              </Kart>
-            </Link>
+            <StaggerOgesi key={talep.id}>
+              <TalepKarti talep={talep} href={`/personel/${talep.id}`} />
+            </StaggerOgesi>
           ))}
-        </div>
+        </FadeInStagger>
       )}
     </div>
   );

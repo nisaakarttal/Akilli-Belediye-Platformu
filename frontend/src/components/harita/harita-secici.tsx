@@ -16,18 +16,16 @@ const varsayilanIkon = L.icon({
   shadowSize: [41, 41],
 });
 
-const VARSAYILAN_YUKSEKLIK = 320;
-const YAKINLASTIRMA_SEVIYESI = 15;
-
-/** Leaflet, aynı DOM elemanına ikinci kez harita bağlanmaya çalışırsa hata fırlatır; bu iç işaretleyiciyi kontrol ederiz. */
-interface LeafletBagliKonteyner extends HTMLDivElement {
+/** Leaflet, bir DOM elemanına harita bağladığında `_leaflet_id` özelliğini çalışma zamanında ekler. */
+interface LeafletKonteyneri extends HTMLDivElement {
   _leaflet_id?: number;
 }
 
 interface HaritaSeciciProps {
   enlem: number;
   boylam: number;
-  onDegistir: (enlem: number, boylam: number) => void;
+  /** Salt okunur modda çağrılmaz; yalnızca etkileşimli kullanımda zorunludur. */
+  onDegistir?: (enlem: number, boylam: number) => void;
   yukseklik?: number;
   saltOkunur?: boolean;
 }
@@ -36,12 +34,12 @@ export function HaritaSecici({
   enlem,
   boylam,
   onDegistir,
-  yukseklik = VARSAYILAN_YUKSEKLIK,
+  yukseklik = 320,
   saltOkunur = false,
 }: HaritaSeciciProps) {
   const mapRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
-  const containerRef = useRef<LeafletBagliKonteyner | null>(null);
+  const containerRef = useRef<LeafletKonteyneri | null>(null);
 
   const [monteEdildi, setMonteEdildi] = useState(false);
 
@@ -49,17 +47,19 @@ export function HaritaSecici({
     setMonteEdildi(true);
   }, []);
 
-  // Haritanın ilklendirilmesi ve temizlenmesi — yalnızca ilk montajda çalışır
+  // Haritanın ilklendirilmesi ve temizlenmesi (cleanup)
   useEffect(() => {
     if (!monteEdildi || !containerRef.current) return;
 
+    // Konteyner üzerinde önceden kalmış bir Leaflet haritası varsa temizle
     if (containerRef.current._leaflet_id) {
       containerRef.current.innerHTML = "";
     }
 
+    // Haritayı sıfırdan oluştur
     const map = L.map(containerRef.current, {
       center: [enlem, boylam],
-      zoom: YAKINLASTIRMA_SEVIYESI,
+      zoom: 15,
       dragging: !saltOkunur,
       scrollWheelZoom: !saltOkunur,
       doubleClickZoom: !saltOkunur,
@@ -72,25 +72,30 @@ export function HaritaSecici({
         '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> katkıda bulunanlar',
     }).addTo(map);
 
+    // Marker ekle
     const marker = L.marker([enlem, boylam], { icon: varsayilanIkon }).addTo(map);
     markerRef.current = marker;
 
+    // Haritaya tıklama olayı (salt okunur değilse)
     if (!saltOkunur) {
       map.on("click", (e: L.LeafletMouseEvent) => {
         const { lat, lng } = e.latlng;
         marker.setLatLng([lat, lng]);
-        onDegistir(lat, lng);
+        onDegistir?.(lat, lng);
       });
     }
 
+    // Bileşen unmount olduğunda haritayı temizle
     return () => {
-      mapRef.current?.remove();
-      mapRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnızca monte edildiğinde bir kez çalışması amaçlanmıştır
   }, [monteEdildi]);
 
-  // Dışarıdan enlem/boylam değiştiğinde haritayı ve ikonu güncelle
+  // Dışarıdan enlem/boylam prop'ları değiştiğinde haritayı ve ikonu güncelle
   useEffect(() => {
     if (!mapRef.current || !markerRef.current) return;
 

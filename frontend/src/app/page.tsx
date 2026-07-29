@@ -2,18 +2,25 @@ import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
 
-// Ekran üstü (above the fold) temel bileşenler
-import { Altbilgi } from "@/components/layout/altbilgi";
+// Ekran üstü (Above the fold) kritik bileşenler
 import { Basli } from "@/components/layout/basli";
+import { Altbilgi } from "@/components/layout/altbilgi";
 import { Hero } from "@/components/home/hero";
 import { BilgiKartlariBolumu } from "@/components/home/bilgi-kartlari-bolumu";
+import { BolumIskeleti } from "@/components/home/bolum-iskeleti";
 
 // Client Component üzerinden güvenli dynamic import
 import { YuzenAsistanWrapper } from "@/components/ai/yuzen-asistan-wrapper";
 
-// Sunucu tarafı tembel yükleme (ssr: false OLMADAN)
-const HaberlerBolumu = dynamic(() => import("@/components/home/haberler-bolumu").then((m) => m.HaberlerBolumu));
-const DuyurularBolumu = dynamic(() => import("@/components/home/duyurular-bolumu").then((m) => m.DuyurularBolumu));
+// Sunucu tarafı optimize edilmiş dinamik bölüm yüklemeleri
+const HaberlerBolumu = dynamic(() =>
+  import("@/components/home/haberler-bolumu").then((m) => m.HaberlerBolumu)
+);
+
+const DuyurularBolumu = dynamic(() =>
+  import("@/components/home/duyurular-bolumu").then((m) => m.DuyurularBolumu)
+);
+
 const EtkinliklerBolumu = dynamic(() =>
   import("@/components/home/etkinlikler-bolumu").then((m) => m.EtkinliklerBolumu)
 );
@@ -21,7 +28,7 @@ const EtkinliklerBolumu = dynamic(() =>
 export const metadata: Metadata = {
   title: "Kapaklı Belediyesi | Akıllı Şehir Hizmet Platformu",
   description:
-    "Kapaklı Belediyesi resmi web portalı. Dijital belediyecilik hizmetleri, güncel haberler, duyurular, etkinlikler ve yapay zeka destekli Kent Asistanı.",
+    "Kapaklı Belediyesi resmi web portalı. Dijital belediyecilik hizmetleri, güncel haberler, duyurular, etkinlikler ve yapay zekâ destekli Kent Asistanı.",
   keywords: ["Kapaklı Belediyesi", "Akıllı Belediye", "Tekirdağ Kapaklı", "E-Belediye", "Kent Asistanı"],
   openGraph: {
     title: "Kapaklı Belediyesi | Akıllı Şehir Hizmet Platformu",
@@ -39,7 +46,13 @@ export const metadata: Metadata = {
 
 export default function AnaSayfa() {
   return (
-    <div className="flex min-h-screen flex-col bg-zemin text-metin antialiased selection:bg-birincil-500 selection:text-white">
+    <div className="relative flex min-h-screen flex-col bg-zemin text-metin antialiased selection:bg-birincil-500/20 selection:text-birincil-600">
+
+      {/* Atmosferik Arka Plan Glow Efektleri */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden -z-10" aria-hidden="true">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[600px] w-full max-w-7xl rounded-full bg-birincil-500/5 blur-[160px]" />
+      </div>
+
       <Basli />
 
       <main id="ana-icerik" className="flex-1">
@@ -61,21 +74,8 @@ export default function AnaSayfa() {
 
       <Altbilgi />
 
-      {/* Güvenli (istemci taraflı) yüklenen yapay zekâ asistanı */}
+      {/* Güvenli ve akıllı konumlandırılmış asistan bileşeni */}
       <YuzenAsistanWrapper />
-    </div>
-  );
-}
-
-function BolumIskeleti() {
-  return (
-    <div className="mx-auto w-full max-w-7xl animate-pulse px-4 py-16">
-      <div className="mx-auto mb-8 h-8 w-48 rounded-md bg-metin-ikincil/10" />
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-        <div className="h-64 rounded-2xl bg-metin-ikincil/10" />
-        <div className="h-64 rounded-2xl bg-metin-ikincil/10" />
-        <div className="h-64 rounded-2xl bg-metin-ikincil/10" />
-      </div>
     </div>
   );
 }

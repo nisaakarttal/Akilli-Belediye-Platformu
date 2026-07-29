@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const TELEFON_DESENI = /^0(5\d{2})\d{7}$/;
+export const TELEFON_DESENI = /^0(5\d{2})\d{7}$/;
 
 export const girisSemasi = z.object({
   e_posta: z.string().min(1, "E-posta adresi zorunludur.").email("Geçerli bir e-posta adresi giriniz."),
@@ -49,12 +49,36 @@ export const sifreSifirlaSemasi = z
   });
 export type SifreSifirlaFormu = z.infer<typeof sifreSifirlaSemasi>;
 
+/**
+ * Talep oluşturma formunun minimum/maksimum uzunluk kuralları.
+ * `sikayet-olustur` sayfası, yapay zekâ analiz butonunu etkinleştirmeden önce
+ * aynı eşikleri kontrol eder — tek kaynaktan yönetilerek iki dosya arasında
+ * değer tekrarı (magic number) önlenir.
+ */
+export const TALEP_BASLIK_MIN_UZUNLUK = 5;
+export const TALEP_BASLIK_MAKS_UZUNLUK = 200;
+export const TALEP_ACIKLAMA_MIN_UZUNLUK = 10;
+export const TALEP_ADRES_DETAY_MAKS_UZUNLUK = 500;
+
 export const talepOlusturSemasi = z.object({
-  baslik: z.string().min(5, "Başlık en az 5 karakter olmalıdır.").max(200),
-  aciklama: z.string().min(10, "Açıklama en az 10 karakter olmalıdır."),
+  baslik: z
+    .string()
+    .min(TALEP_BASLIK_MIN_UZUNLUK, `Başlık en az ${TALEP_BASLIK_MIN_UZUNLUK} karakter olmalıdır.`)
+    .max(TALEP_BASLIK_MAKS_UZUNLUK),
+  aciklama: z
+    .string()
+    .min(TALEP_ACIKLAMA_MIN_UZUNLUK, `Açıklama en az ${TALEP_ACIKLAMA_MIN_UZUNLUK} karakter olmalıdır.`),
   kategori_id: z.string().min(1, "Lütfen bir kategori seçiniz."),
   mahalle_id: z.string().min(1, "Lütfen bir mahalle seçiniz."),
-  adres_detay: z.string().max(500).optional().or(z.literal("")),
+  adres_detay: z.string().max(TALEP_ADRES_DETAY_MAKS_UZUNLUK).optional().or(z.literal("")),
   oncelik: z.enum(["dusuk", "orta", "yuksek", "acil"]),
 });
 export type TalepOlusturFormu = z.infer<typeof talepOlusturSemasi>;
+
+export const profilSemasi = z.object({
+  ad: z.string().min(2, "Ad en az 2 karakter olmalıdır.").max(100),
+  soyad: z.string().min(2, "Soyad en az 2 karakter olmalıdır.").max(100),
+  telefon: z.string().regex(TELEFON_DESENI, "Telefon numarası 05XXXXXXXXX formatında olmalıdır."),
+  adres: z.string().max(500).optional().or(z.literal("")),
+});
+export type ProfilFormu = z.infer<typeof profilSemasi>;

@@ -8,8 +8,8 @@
   --metin: 15 23 42; /* #0F172A */
   --metin-ikincil: 71 85 105;
   --kenarlik: 226 232 240;
-  --cam-arkaplan: 255 255 255 / 0.6;
-  --cam-kenarlik: 255 255 255 / 0.4;
+  --cam-arkaplan: 255 255 255 / 0.65;
+  --cam-kenarlik: 255 255 255 / 0.5;
 }
 
 .dark {
@@ -18,7 +18,7 @@
   --metin: 248 250 252;
   --metin-ikincil: 148 163 184;
   --kenarlik: 51 65 85;
-  --cam-arkaplan: 15 23 42 / 0.55;
+  --cam-arkaplan: 15 23 42 / 0.6;
   --cam-kenarlik: 255 255 255 / 0.08;
 }
 
@@ -26,22 +26,44 @@ body {
   background-color: rgb(var(--zemin));
   color: rgb(var(--metin));
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Glassmorphism kart yardımcı sınıfı */
+/* Master Glassmorphism kart yardımcı sınıfı */
 .cam-kart {
   background-color: rgb(var(--cam-arkaplan));
   border: 1px solid rgb(var(--cam-kenarlik));
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
-/* Kaydırma çubuğu */
+/* Scrollbar optimizasyonları */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 ::-webkit-scrollbar-thumb {
   background-color: rgb(var(--kenarlik));
   border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(var(--metin-ikincil) / 0.4);
+}
+
+/* Gizli scrollbar sınıfı */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

@@ -1,23 +1,38 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { MapPin, MessageSquarePlus, Search } from "lucide-react";
 import Link from "next/link";
 
 import { PikselSehir } from "@/components/home/piksel/piksel-sehir";
 import { Dugme } from "@/components/ui/button";
 
+const KART_VARYANTI: Variants = {
+  gizli: { opacity: 0, y: 20 },
+  gorunur: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const DUGME_GRUBU_VARYANTI: Variants = {
+  gizli: {},
+  gorunur: { transition: { staggerChildren: 0.08, delayChildren: 0.3 } },
+};
+
+const DUGME_VARYANTI: Variants = {
+  gizli: { opacity: 0, y: 12 },
+  gorunur: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+
 export function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden" aria-label="Kapaklı Belediyesi tanıtım alanı">
       <div className="relative h-[420px] sm:h-[480px]">
         <PikselSehir />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-6 px-4 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            initial="gizli"
+            animate="gorunur"
+            variants={KART_VARYANTI}
             className="cam-kart rounded-3xl px-6 py-8 sm:px-12 sm:py-10"
           >
             <span className="mb-3 inline-block rounded-full bg-birincil-600/10 px-3 py-1 text-xs font-medium text-birincil-700 dark:text-birincil-300">
@@ -31,26 +46,39 @@ export function Hero() {
               sohbet edin, belediye hizmetlerine tek noktadan ulaşın.
             </p>
 
-            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-              <Link href="/sikayet-olustur">
-                <Dugme varyant="birincil" boyut="buyuk" className="gap-2">
-                  <MessageSquarePlus size={20} />
-                  Hızlı Şikâyet Oluştur
-                </Dugme>
-              </Link>
-              <Link href="/taleplerim">
-                <Dugme varyant="cam" boyut="buyuk" className="gap-2">
-                  <Search size={20} />
-                  Talep Takip Et
-                </Dugme>
-              </Link>
-              <Link href="/harita">
-                <Dugme varyant="hayalet" boyut="buyuk" className="gap-2">
-                  <MapPin size={20} />
-                  Haritada Gör
-                </Dugme>
-              </Link>
-            </div>
+            <motion.div
+              initial="gizli"
+              animate="gorunur"
+              variants={DUGME_GRUBU_VARYANTI}
+              className="mt-6 flex flex-wrap items-center justify-center gap-3"
+            >
+              <motion.div variants={DUGME_VARYANTI}>
+                <Link href="/sikayet-olustur">
+                  <Dugme varyant="birincil" boyut="buyuk" className="gap-2">
+                    <MessageSquarePlus size={20} aria-hidden="true" />
+                    Hızlı Şikâyet Oluştur
+                  </Dugme>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={DUGME_VARYANTI}>
+                <Link href="/taleplerim">
+                  <Dugme varyant="cam" boyut="buyuk" className="gap-2">
+                    <Search size={20} aria-hidden="true" />
+                    Talep Takip Et
+                  </Dugme>
+                </Link>
+              </motion.div>
+
+              <motion.div variants={DUGME_VARYANTI}>
+                <Link href="/harita">
+                  <Dugme varyant="hayalet" boyut="buyuk" className="gap-2">
+                    <MapPin size={20} aria-hidden="true" />
+                    Haritada Gör
+                  </Dugme>
+                </Link>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </div>
       </div>

@@ -2,16 +2,18 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Loader2, LogIn, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
+import { KimlikKarti } from "@/components/layout/kimlik-karti";
 import { Dugme } from "@/components/ui/button";
-import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
+import { FormAlani } from "@/components/ui/form-alani";
 import { Girdi } from "@/components/ui/input";
 import { Etiket } from "@/components/ui/label";
+import { SifreGirdisi } from "@/components/ui/sifre-girdisi";
 import { Uyari } from "@/components/ui/uyari";
 import { useKimlik } from "@/hooks/use-kimlik";
 import { apiHataMesaji } from "@/lib/api";
@@ -22,7 +24,6 @@ export default function GirisSayfasi() {
   const router = useRouter();
   const [sunucuHatasi, setSunucuHatasi] = useState<string | null>(null);
   const [gonderiliyor, setGonderiliyor] = useState(false);
-  const [sifreGoster, setSifreGoster] = useState(false);
 
   const {
     register,
@@ -44,117 +45,116 @@ export default function GirisSayfasi() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-zemin-ikincil px-4 py-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-        className="w-full max-w-md"
-      >
-        <Kart className="border-kenarlik/50 bg-white/90 shadow-xl backdrop-blur-sm dark:bg-slate-900/90">
-          <KartBasligi className="space-y-2 pb-2 text-center">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full border-4 border-white bg-birincil-50 text-birincil-600 shadow-md dark:border-slate-800">
-              <LogIn className="h-7 w-7 text-birincil-700" />
+    <div className="relative min-h-[85vh] flex items-center justify-center px-4 py-12">
+      {/* Atmosferik Arka Plan Glow Efektleri */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[450px] w-[450px] rounded-full bg-birincil-500/10 blur-[120px] dark:bg-birincil-500/5" />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        <KimlikKarti
+          ikon={LogIn}
+          baslik="Kapaklı Akıllı Belediye"
+          aciklama="Belediye hizmetlerine erişmek için giriş yapın"
+          altBilgi={
+            <div className="flex items-center justify-center gap-1.5 text-sm">
+              <span className="text-metin-ikincil">Hesabınız yok mu?</span>
+              <Link
+                href="/kayit"
+                className="font-semibold text-birincil-600 transition-colors hover:text-birincil-700 hover:underline underline-offset-4"
+              >
+                Hemen Kayıt Olun
+              </Link>
             </div>
-            <KartBaslik className="text-3xl font-extrabold tracking-tighter text-metin">
-              Kapaklı Akıllı Belediye
-            </KartBaslik>
-            <p className="text-base font-medium text-metin-ikincil">Platforma giriş yapın</p>
-          </KartBasligi>
+          }
+        >
+          <form onSubmit={handleSubmit(gonder)} className="space-y-5">
+            <AnimatePresence initial={false}>
+              {sunucuHatasi && (
+                <motion.div
+                  key="sunucu-hatasi"
+                  initial={{ opacity: 0, height: 0, y: -8 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -8 }}
+                  transition={{ duration: 0.25, ease: "easeOut" }}
+                >
+                  <Uyari tur="hata">{sunucuHatasi}</Uyari>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-          <KartIcerik className="px-8 pb-7 pt-5">
-            <form onSubmit={handleSubmit(gonder)} className="space-y-5" noValidate>
-              <AnimatePresence>
-                {sunucuHatasi && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="overflow-hidden"
-                  >
-                    <Uyari tur="hata">{sunucuHatasi}</Uyari>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <div className="space-y-1.5">
-                <Etiket htmlFor="e_posta" className="text-sm font-semibold text-metin">
-                  E-posta Adresi
-                </Etiket>
+            <FormAlani id="e_posta" etiket="E-posta Adresi" hata={errors.e_posta?.message}>
+              <div className="relative">
                 <Girdi
                   id="e_posta"
                   type="email"
                   autoComplete="email"
                   placeholder="ornek@kapakli.bel.tr"
-                  hataliMi={!!errors.e_posta}
+                  aria-invalid={!!errors.e_posta}
+                  className="transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20"
                   {...register("e_posta")}
                 />
-                {errors.e_posta && (
-                  <p className="pl-1 text-xs font-medium text-tehlike">{errors.e_posta.message}</p>
-                )}
               </div>
+            </FormAlani>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <Etiket htmlFor="sifre" className="text-sm font-semibold text-metin">
-                    Şifre
-                  </Etiket>
-                  <Link
-                    href="/sifremi-unuttum"
-                    className="text-xs font-semibold text-birincil-700 transition-colors hover:text-ikincil-600 hover:underline dark:text-birincil-300"
-                  >
-                    Şifremi Unuttum
-                  </Link>
-                </div>
-                <div className="relative">
-                  <Girdi
-                    id="sifre"
-                    type={sifreGoster ? "text" : "password"}
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    hataliMi={!!errors.sifre}
-                    className="pr-10"
-                    {...register("sifre")}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setSifreGoster((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-metin-ikincil transition-colors hover:text-metin"
-                    aria-label={sifreGoster ? "Şifreyi gizle" : "Şifreyi göster"}
-                  >
-                    {sifreGoster ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {errors.sifre && <p className="pl-1 text-xs font-medium text-tehlike">{errors.sifre.message}</p>}
-              </div>
-
-              <Dugme
-                type="submit"
-                varyant="birincil"
-                boyut="buyuk"
-                className="mt-4 w-full gap-2 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg"
-                yukleniyorMu={gonderiliyor}
-                yukleniyorMetni="Giriş Yapılıyor..."
-              >
-                <LogIn className="h-5 w-5" />
-                Giriş Yap
-              </Dugme>
-            </form>
-
-            <div className="mt-8 border-t border-kenarlik pt-6 text-center">
-              <p className="text-sm font-medium text-metin-ikincil">
-                Hesabınız yok mu?{" "}
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <Etiket htmlFor="sifre">Şifre</Etiket>
                 <Link
-                  href="/kayit"
-                  className="font-bold text-ikincil-600 transition-colors hover:text-sky-700 hover:underline"
+                  href="/sifremi-unuttum"
+                  className="text-xs font-semibold text-birincil-600 transition-colors hover:text-birincil-700 hover:underline underline-offset-4"
                 >
-                  Kayıt Olun
+                  Şifremi Unuttum?
                 </Link>
-              </p>
+              </div>
+              <SifreGirdisi
+                id="sifre"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                aria-invalid={!!errors.sifre}
+                className="transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20"
+                {...register("sifre")}
+              />
+              {errors.sifre && (
+                <motion.p
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-1.5 text-xs font-medium text-tehlike"
+                  role="alert"
+                >
+                  {errors.sifre.message}
+                </motion.p>
+              )}
             </div>
-          </KartIcerik>
-        </Kart>
-      </motion.div>
+
+            <Dugme
+              type="submit"
+              varyant="birincil"
+              boyut="buyuk"
+              className="w-full gap-2 shadow-lg shadow-birincil-600/20 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
+              disabled={gonderiliyor}
+            >
+              {gonderiliyor ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+                  <span>Giriş Yapılıyor...</span>
+                </>
+              ) : (
+                <>
+                  <LogIn className="h-5 w-5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  <span>Giriş Yap</span>
+                </>
+              )}
+            </Dugme>
+
+            {/* Güvenlik rozeti */}
+            <div className="pt-2 flex items-center justify-center gap-1.5 text-xs text-metin-ikincil/80">
+              <ShieldCheck className="h-4 w-4 text-basarili" />
+              <span>256-bit SSL Güvenli Kurumsal Oturum</span>
+            </div>
+          </form>
+        </KimlikKarti>
+      </div>
     </div>
   );
 }

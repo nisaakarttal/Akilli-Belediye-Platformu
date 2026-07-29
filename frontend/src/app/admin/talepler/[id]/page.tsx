@@ -1,26 +1,25 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowLeft,
-  MapPin,
-  UserPlus,
-  FileText,
-  Clock,
   Building,
   Calendar,
+  Clock,
+  FileText,
   Layers,
   Loader2,
-  UserCheck,
-  Tag,
+  MapPin,
   Sparkles,
+  Tag,
+  UserCheck,
+  UserPlus,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import { useState } from "react";
 
+import { DetayBilgiKarti } from "@/components/admin/detay-bilgi-karti";
+import { YoneticiBolumKarti } from "@/components/admin/yonetici-bolum-karti";
 import { KorumaliRota } from "@/components/layout/korumali-rota";
 import { DosyaListesi } from "@/components/sikayet/dosya-listesi";
 import { DurumRozeti } from "@/components/sikayet/durum-rozeti";
@@ -31,77 +30,44 @@ import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card"
 import { Secim } from "@/components/ui/select";
 import { Uyari } from "@/components/ui/uyari";
 import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
-import { kullanicilarApi } from "@/lib/api/kullanicilar";
-import { taleplerApi } from "@/lib/api/talepler";
+import { useAdminTalepDetay } from "@/hooks/use-admin-talep-detay";
+import { tarihSaatFormatla } from "@/lib/tarih";
 
 const HaritaSecici = dynamic(
   () => import("@/components/harita/harita-secici").then((mod) => mod.HaritaSecici),
   {
     ssr: false,
     loading: () => (
-      <div className="h-64 w-full animate-pulse rounded-2xl bg-gradient-to-r from-slate-100 to-indigo-50/50 flex flex-col items-center justify-center gap-2 text-xs font-semibold text-indigo-500 border border-indigo-100">
-        <Loader2 size={24} className="animate-spin text-indigo-600" />
+      <div className="flex h-64 w-full flex-col items-center justify-center gap-2 rounded-2xl border border-kenarlik bg-black/5 text-xs font-semibold text-metin-ikincil dark:bg-white/5">
+        <Loader2 size={24} className="animate-spin text-birincil-600" aria-hidden="true" />
         <span>Harita ve GPS Verileri Yükleniyor...</span>
       </div>
     ),
   }
 );
 
-function tarihiBicimlendir(isoTarih: string) {
-  return new Date(isoTarih).toLocaleString("tr-TR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
-
 function AdminTalepDetayIcerik() {
-  const { id } = useParams<{ id: string }>();
-  const queryClient = useQueryClient();
-  const [secilenPersonelId, setSecilenPersonelId] = useState<string>("");
-  const [bildirim, setBildirim] = useState<{ tip: "basari" | "hata"; mesaj: string } | null>(null);
-
-  // 1. Talep Detay Query
-  const { data: talep, isLoading, isError } = useQuery({
-    queryKey: ["admin-talep", id],
-    queryFn: () => taleplerApi.getir(id),
-  });
-
-  // 2. Personeller Query
-  const { data: personelListesi, isLoading: personellerYukleniyor } = useQuery({
-    queryKey: ["personeller"],
-    queryFn: () => kullanicilarApi.listele({ rol: "personel" }),
-  });
-
-  // 3. Personel Atama Mutation
-  const atamaMutation = useMutation({
-    mutationFn: (personelId: string) => taleplerApi.ata(id, personelId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin-talep", id] });
-      setBildirim({ tip: "basari", mesaj: "Talep başarıyla ilgili personele atandı." });
-      setSecilenPersonelId("");
-      setTimeout(() => setBildirim(null), 4000);
-    },
-    onError: () => {
-      setBildirim({ tip: "hata", mesaj: "Atama işlemi sırasında bir sorun oluştu. Lütfen tekrar deneyin." });
-      setTimeout(() => setBildirim(null), 4000);
-    },
-  });
-
-  // Mevcut atanan personel nesnesini bul
-  const atananPersonel = personelListesi?.veriler?.find((p) => p.id === talep?.atanan_personel_id);
+  const {
+    talep,
+    isLoading,
+    isError,
+    personelListesi,
+    personellerYukleniyor,
+    secilenPersonelId,
+    setSecilenPersonelId,
+    atamaMutation,
+    atananPersonel,
+    bildirim,
+  } = useAdminTalepDetay();
 
   return (
-    <div className="space-y-6 pt-2 pb-12">
-      {/* GERİ DÖN BUTONU */}
+    <div className="space-y-6 pb-12 pt-2">
       <div>
         <Link
           href="/admin/talepler"
-          className="inline-flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition-all"
+          className="inline-flex items-center gap-2 rounded-xl bg-birincil-600/10 px-3 py-1.5 text-xs font-bold text-birincil-600 transition-all hover:bg-birincil-600/20"
         >
-          <ArrowLeft size={14} /> Tüm Taleplere Dön
+          <ArrowLeft size={14} aria-hidden="true" /> Tüm Taleplere Dön
         </Link>
       </div>
 
@@ -111,36 +77,33 @@ function AdminTalepDetayIcerik() {
         <Uyari tur="hata">Talep detayları alınamadı. Talep silinmiş veya erişim yetkiniz sınırlandırılmış olabilir.</Uyari>
       )}
 
-      {/* BİLDİRİM PANELİ */}
       <AnimatePresence mode="wait">
         {bildirim && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-            <Uyari tur={bildirim.tip === "basari" ? "bilgi" : "hata"}>{bildirim.mesaj}</Uyari>
+            <Uyari tur={bildirim.tip === "basari" ? "basari" : "hata"}>{bildirim.mesaj}</Uyari>
           </motion.div>
         )}
       </AnimatePresence>
 
       {talep && (
         <div className="space-y-6">
-          {/* ==================== 1. TALEP ÜST BAŞLIK KARTI ==================== */}
+          {/* 1. Talep üst başlık kartı */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }}>
-            <Kart className="relative overflow-hidden border border-indigo-100 bg-white shadow-xl">
-              <div className="h-2 w-full bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
-              <KartBasligi className="border-b border-indigo-50 pb-5 pt-6">
+            <Kart className="overflow-hidden">
+              <div className="h-2 w-full bg-gradient-to-r from-birincil-600 to-ikincil-500" aria-hidden="true" />
+              <KartBasligi className="border-b border-kenarlik pb-5 pt-6">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="space-y-1.5">
                     <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 font-mono text-xs font-black tracking-wider text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-md border border-indigo-100">
-                        <Tag size={12} /> #{talep.takip_no}
+                      <span className="inline-flex items-center gap-1 rounded-md border border-birincil-600/20 bg-birincil-600/10 px-2.5 py-0.5 font-mono text-xs font-black tracking-wider text-birincil-600">
+                        <Tag size={12} aria-hidden="true" /> #{talep.takip_no}
                       </span>
-                      <span className="text-xs font-bold text-metin-ikincil flex items-center gap-1">
-                        <Calendar size={13} className="text-indigo-500" />
-                        {tarihiBicimlendir(talep.olusturulma_tarihi)}
+                      <span className="flex items-center gap-1 text-xs font-bold text-metin-ikincil">
+                        <Calendar size={13} className="text-birincil-500" aria-hidden="true" />
+                        {tarihSaatFormatla(talep.olusturulma_tarihi)}
                       </span>
                     </div>
-                    <KartBaslik className="text-xl sm:text-2xl font-black text-metin">
-                      {talep.baslik}
-                    </KartBaslik>
+                    <KartBaslik className="text-xl sm:text-2xl">{talep.baslik}</KartBaslik>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -151,69 +114,49 @@ function AdminTalepDetayIcerik() {
               </KartBasligi>
 
               <KartIcerik className="space-y-6 pt-6">
-                {/* Açıklama Kutusu */}
-                <div className="rounded-2xl bg-gradient-to-br from-slate-50 to-indigo-50/30 p-4 border border-indigo-100/60">
-                  <p className="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-1 flex items-center gap-1.5">
-                    <FileText size={14} className="text-indigo-600" /> Talep / Şikayet Detayı
+                <div className="rounded-2xl border border-kenarlik bg-black/[0.02] p-4 dark:bg-white/[0.02]">
+                  <p className="mb-1 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-metin-ikincil">
+                    <FileText size={14} className="text-birincil-600" aria-hidden="true" /> Talep / Şikâyet Detayı
                   </p>
-                  <p className="text-sm font-medium text-metin leading-relaxed whitespace-pre-wrap">{talep.aciklama}</p>
+                  <p className="whitespace-pre-wrap text-sm font-medium leading-relaxed text-metin">{talep.aciklama}</p>
                 </div>
 
-                {/* Özet Meta Grid */}
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50/30 p-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600 text-white shadow-xs">
-                      <Layers size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-blue-900/70">Kategori</p>
-                      <p className="text-sm font-extrabold text-metin">{talep.kategori.ad}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 rounded-xl border border-purple-100 bg-purple-50/30 p-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-600 text-white shadow-xs">
-                      <Building size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-purple-900/70">Sorumlu Birim</p>
-                      <p className="text-sm font-extrabold text-metin">{talep.kategori.sorumlu_departman}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50/30 p-3 sm:col-span-2 lg:col-span-1">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-600 text-white shadow-xs">
-                      <MapPin size={18} />
-                    </div>
-                    <div>
-                      <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-900/70">Mahalle / Bölge</p>
-                      <p className="text-sm font-extrabold text-metin">{talep.mahalle.ad}</p>
-                    </div>
-                  </div>
+                  <DetayBilgiKarti ikon={Layers} etiket="Kategori" deger={talep.kategori.ad} vurgu="birincil" />
+                  <DetayBilgiKarti
+                    ikon={Building}
+                    etiket="Sorumlu Birim"
+                    deger={talep.kategori.sorumlu_departman}
+                    vurgu="ikincil"
+                  />
+                  <DetayBilgiKarti
+                    ikon={MapPin}
+                    etiket="Mahalle / Bölge"
+                    deger={talep.mahalle.ad}
+                    vurgu="basarili"
+                    className="sm:col-span-2 lg:col-span-1"
+                  />
                 </div>
               </KartIcerik>
             </Kart>
           </motion.div>
 
-          {/* ==================== 2. PERSONEL ATAMA PANELİ ==================== */}
+          {/* 2. Personel atama paneli */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
-              <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 to-teal-600" />
-              <KartBasligi className="border-b border-indigo-50 pb-4">
-                <KartBaslik className="flex items-center gap-2 text-lg text-indigo-950 font-extrabold">
-                  <UserPlus size={20} className="text-indigo-600" /> Personel Görevlendirme
-                </KartBaslik>
-              </KartBasligi>
-
-              <KartIcerik className="space-y-4 pt-5">
-                {/* Atanmış Personel Rozeti varsa */}
+            <YoneticiBolumKarti ikon={UserPlus} baslik="Personel Görevlendirme" ustCubukSinifi="bg-basarili">
+              <div className="space-y-4">
                 {atananPersonel && (
-                  <div className="flex items-center gap-3 rounded-xl bg-emerald-50 border border-emerald-200 p-3 text-emerald-900">
-                    <UserCheck size={20} className="text-emerald-600" />
+                  <div className="flex items-center gap-3 rounded-xl border border-basarili/20 bg-basarili/10 p-3 text-green-800 dark:text-green-300">
+                    <UserCheck size={20} className="text-green-600 dark:text-green-400" aria-hidden="true" />
                     <div>
-                      <p className="text-xs font-bold text-emerald-800 uppercase tracking-wide">Şu an Atalı Personel</p>
+                      <p className="text-xs font-bold uppercase tracking-wide text-green-700 dark:text-green-400">
+                        Şu an Atalı Personel
+                      </p>
                       <p className="text-sm font-black">
-                        {atananPersonel.ad} {atananPersonel.soyad} <span className="font-normal text-xs text-emerald-700">({atananPersonel.e_posta})</span>
+                        {atananPersonel.ad} {atananPersonel.soyad}{" "}
+                        <span className="text-xs font-normal text-green-700 dark:text-green-400">
+                          ({atananPersonel.e_posta})
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -224,8 +167,9 @@ function AdminTalepDetayIcerik() {
                     <Secim
                       value={secilenPersonelId}
                       onChange={(e) => setSecilenPersonelId(e.target.value)}
-                      className="bg-white border-indigo-200 focus:border-indigo-500 text-sm font-medium"
+                      className="text-sm font-medium"
                       disabled={personellerYukleniyor}
+                      aria-label="Saha personeli seçiniz"
                     >
                       <option value="">
                         {personellerYukleniyor ? "Personel listesi çekiliyor..." : "Saha Personeli Seçiniz..."}
@@ -242,78 +186,59 @@ function AdminTalepDetayIcerik() {
                     varyant="birincil"
                     disabled={!secilenPersonelId || atamaMutation.isPending}
                     onClick={() => atamaMutation.mutate(secilenPersonelId)}
-                    className="gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold shadow-md shadow-indigo-500/20"
+                    className="gap-2"
                   >
                     {atamaMutation.isPending ? (
                       <>
-                        <Loader2 size={16} className="animate-spin" />
+                        <Loader2 size={16} className="animate-spin" aria-hidden="true" />
                         <span>Atanıyor...</span>
                       </>
                     ) : (
                       <>
-                        <UserCheck size={16} />
+                        <UserCheck size={16} aria-hidden="true" />
                         <span>{atananPersonel ? "Atamayı Güncelle" : "Görevi Ata"}</span>
                       </>
                     )}
                   </Dugme>
                 </div>
-              </KartIcerik>
-            </Kart>
+              </div>
+            </YoneticiBolumKarti>
           </motion.div>
 
-          {/* ==================== 3. HARİTA KOORDİNAT KARTI ==================== */}
+          {/* 3. Harita / koordinat kartı */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
-              <div className="h-1.5 w-full bg-gradient-to-r from-cyan-500 to-blue-600" />
-              <KartBasligi className="border-b border-indigo-50 pb-4">
-                <div className="flex items-center justify-between">
-                  <KartBaslik className="flex items-center gap-2 text-lg text-indigo-950 font-extrabold">
-                    <MapPin size={20} className="text-cyan-600" /> Coğrafi Konum Bilgisi
-                  </KartBaslik>
-                  <span className="font-mono text-xs font-bold text-indigo-600 bg-cyan-50 px-2.5 py-1 rounded-md border border-cyan-100">
-                    GPS: {talep.enlem?.toFixed(4)}, {talep.boylam?.toFixed(4)}
-                  </span>
-                </div>
-              </KartBasligi>
-
-              <KartIcerik className="pt-4">
-                <div className="overflow-hidden rounded-xl border border-indigo-100 shadow-inner">
-                  <HaritaSecici enlem={talep.enlem} boylam={talep.boylam} onDegistir={() => {}} saltOkunur />
-                </div>
-              </KartIcerik>
-            </Kart>
+            <YoneticiBolumKarti
+              ikon={MapPin}
+              baslik="Coğrafi Konum Bilgisi"
+              ustCubukSinifi="bg-ikincil-500"
+              sagIcerik={
+                <span className="rounded-md border border-ikincil-500/20 bg-ikincil-500/10 px-2.5 py-1 font-mono text-xs font-bold text-sky-600">
+                  GPS: {talep.enlem.toFixed(4)}, {talep.boylam.toFixed(4)}
+                </span>
+              }
+            >
+              <div className="overflow-hidden rounded-xl border border-kenarlik">
+                <HaritaSecici enlem={talep.enlem} boylam={talep.boylam} saltOkunur />
+              </div>
+            </YoneticiBolumKarti>
           </motion.div>
 
-          {/* ==================== 4. EKLER & DOSYALAR ==================== */}
+          {/* 4. Ekler ve dosyalar */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
-            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
-              <div className="h-1.5 w-full bg-gradient-to-r from-fuchsia-500 to-pink-600" />
-              <KartBasligi className="border-b border-indigo-50 pb-4">
-                <KartBaslik className="flex items-center gap-2 text-lg text-indigo-950 font-extrabold">
-                  <Sparkles size={20} className="text-fuchsia-600" /> Ekli Medya ve Dosyalar ({talep.dosyalar?.length || 0})
-                </KartBaslik>
-              </KartBasligi>
-
-              <KartIcerik className="pt-4">
-                <DosyaListesi dosyalar={talep.dosyalar} />
-              </KartIcerik>
-            </Kart>
+            <YoneticiBolumKarti
+              ikon={Sparkles}
+              baslik={`Ekli Medya ve Dosyalar (${talep.dosyalar?.length || 0})`}
+              ustCubukSinifi="bg-pink-500"
+            >
+              <DosyaListesi dosyalar={talep.dosyalar} />
+            </YoneticiBolumKarti>
           </motion.div>
 
-          {/* ==================== 5. ZAMAN TÜNELİ KARTI ==================== */}
+          {/* 5. Zaman tüneli */}
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
-            <Kart className="border border-indigo-100 bg-white shadow-lg relative overflow-hidden">
-              <div className="h-1.5 w-full bg-gradient-to-r from-amber-500 to-orange-600" />
-              <KartBasligi className="border-b border-indigo-50 pb-4">
-                <KartBaslik className="flex items-center gap-2 text-lg text-indigo-950 font-extrabold">
-                  <Clock size={20} className="text-amber-600" /> Talep İşlem Zaman Tüneli
-                </KartBaslik>
-              </KartBasligi>
-
-              <KartIcerik className="pt-4">
-                <ZamanTuneli gecmis={talep.durum_gecmisi} />
-              </KartIcerik>
-            </Kart>
+            <YoneticiBolumKarti ikon={Clock} baslik="Talep İşlem Zaman Tüneli" ustCubukSinifi="bg-uyari">
+              <ZamanTuneli gecmis={talep.durum_gecmisi} />
+            </YoneticiBolumKarti>
           </motion.div>
         </div>
       )}
