@@ -77,6 +77,65 @@ Proje kapsamında aşağıdaki güvenlik önlemleri uygulanmıştır:
 
 ⭐ Admin kullanıcıları için 2FA (Two-Factor Authentication) desteği eklenmesi  
 
+# 🚧 Yapılacaklar (Roadmap)
+
+## 🔔 Bildirim Sistemi
+- [ ] WebSocket ile gerçek zamanlı bildirim altyapısı
+- [ ] Bildirim okunma durumu
+- [ ] Tarayıcı push bildirimleri
+
+## 📍 Konum ve Harita
+- [ ] Talep oluştururken harita üzerinden konum seçme
+- [ ] Şikayet yoğunluk (Heatmap) haritası
+- [ ] Mahalle bazlı istatistikler
+
+## 🤖 Yapay Zekâ
+- [ ] AI ile otomatik kategori belirleme
+- [ ] AI destekli öncelik analizi
+- [ ] AI ile ilgili müdürlüğe otomatik yönlendirme
+- [ ] Belediye bilgi asistanının geliştirilmesi
+
+## 📊 Dashboard ve Analitik
+- [ ] Personel performans paneli
+- [ ] Ortalama çözüm süresi analizleri
+- [ ] Günlük / aylık başvuru raporları
+- [ ] Gelişmiş grafik ve veri görselleştirme
+
+## 📋 Talep Yönetimi
+- [ ] SLA (Servis Seviyesi) takip sistemi
+- [ ] Otomatik geciken talep uyarıları
+- [ ] Vatandaş memnuniyet puanlama sistemi
+- [ ] Talep takip numarası oluşturma
+
+## ⚡ Performans
+- [ ] Redis cache desteği
+- [ ] Background Task optimizasyonları
+- [ ] API performans iyileştirmeleri
+
+## 🔐 Güvenlik
+- [ ] Audit Log sistemi
+- [ ] Gelişmiş Rate Limit
+- [ ] Soft Delete altyapısı
+- [ ] Güvenlik testlerinin artırılması
+
+## 🧪 Test ve Kalite
+- [ ] Unit Test
+- [ ] Integration Test
+- [ ] API Testleri
+- [ ] Kod kapsamı (Coverage) raporları
+
+## 🚀 DevOps
+- [ ] GitHub Actions CI/CD
+- [ ] Production Docker optimizasyonu
+- [ ] Monitoring ve Log yönetimi
+- [ ] Otomatik yedekleme stratejisi
+
+## 📱 Kullanıcı Deneyimi
+- [ ] Progressive Web App (PWA)
+- [ ] Karanlık tema desteği
+- [ ] Çoklu dil desteği
+- [ ] Gelişmiş arama ve filtreleme
+
 ## Güvenlik mimari
 
 Kullanıcı
