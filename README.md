@@ -77,64 +77,107 @@ Proje kapsamında aşağıdaki güvenlik önlemleri uygulanmıştır:
 
 ⭐ Admin kullanıcıları için 2FA (Two-Factor Authentication) desteği eklenmesi  
 
-# 🚧 Yapılacaklar (Roadmap)
+## Planlanan Geliştirmeler
 
-## 🔔 Bildirim Sistemi
-- [ ] WebSocket ile gerçek zamanlı bildirim altyapısı
-- [ ] Bildirim okunma durumu
-- [ ] Tarayıcı push bildirimleri
+### Gerçek Zamanlı Bildirim Sistemi
+- WebSocket tabanlı anlık bildirim altyapısı
+- Kullanıcı bazlı bildirim kanalları
+- Okundu/okunmadı durumu
+- Gerçek zamanlı bildirim gönderimi
+- Bildirim geçmişi
 
-## 📍 Konum ve Harita
-- [ ] Talep oluştururken harita üzerinden konum seçme
-- [ ] Şikayet yoğunluk (Heatmap) haritası
-- [ ] Mahalle bazlı istatistikler
+### Zamanlanmış Görevler (Scheduler)
+- APScheduler/Celery entegrasyonu
+- Süresi geçen taleplerin otomatik kontrolü
+- Cevaplanmayan başvurular için hatırlatma
+- Periyodik sistem görevleri
+- Otomatik rapor oluşturma
 
-## 🤖 Yapay Zekâ
-- [ ] AI ile otomatik kategori belirleme
-- [ ] AI destekli öncelik analizi
-- [ ] AI ile ilgili müdürlüğe otomatik yönlendirme
-- [ ] Belediye bilgi asistanının geliştirilmesi
+### Audit Log Sistemi
+- Yönetici işlemlerinin kayıt altına alınması
+- Kullanıcı ve kategori değişikliklerinin loglanması
+- İşlem geçmişi görüntüleme
+- Detaylı sistem kayıtları
 
-## 📊 Dashboard ve Analitik
-- [ ] Personel performans paneli
-- [ ] Ortalama çözüm süresi analizleri
-- [ ] Günlük / aylık başvuru raporları
-- [ ] Gelişmiş grafik ve veri görselleştirme
+### API Rate Limiting
+- API istek sınırlandırması
+- IP ve kullanıcı bazlı rate limit
+- Hassas endpointler için özel limitler
+- Rate limit ihlali kayıtları
 
-## 📋 Talep Yönetimi
-- [ ] SLA (Servis Seviyesi) takip sistemi
-- [ ] Otomatik geciken talep uyarıları
-- [ ] Vatandaş memnuniyet puanlama sistemi
-- [ ] Talep takip numarası oluşturma
+### Soft Delete Desteği
+- Silinen kayıtların pasif duruma alınması
+- Geri yükleme desteği
+- Kalıcı silme işlemleri
+- Veri bütünlüğünün korunması
 
-## ⚡ Performans
-- [ ] Redis cache desteği
-- [ ] Background Task optimizasyonları
-- [ ] API performans iyileştirmeleri
+### Redis Cache
+- Dashboard verilerinin önbelleğe alınması
+- Kategori ve mahalle bilgilerinin cachelenmesi
+- Performans optimizasyonu
+- Cache yönetimi
 
-## 🔐 Güvenlik
-- [ ] Audit Log sistemi
-- [ ] Gelişmiş Rate Limit
-- [ ] Soft Delete altyapısı
-- [ ] Güvenlik testlerinin artırılması
+### Background Task Sistemi
+- Arka planda AI analizleri
+- Dosya işleme görevleri
+- E-posta gönderimleri
+- Uzun süren işlemlerin asenkron yürütülmesi
 
-## 🧪 Test ve Kalite
-- [ ] Unit Test
-- [ ] Integration Test
-- [ ] API Testleri
-- [ ] Kod kapsamı (Coverage) raporları
+### API Versioning
+- `/api/v1` ve `/api/v2` desteği
+- Geriye dönük uyumluluk
+- Sürüm bazlı endpoint yönetimi
 
-## 🚀 DevOps
-- [ ] GitHub Actions CI/CD
-- [ ] Production Docker optimizasyonu
-- [ ] Monitoring ve Log yönetimi
-- [ ] Otomatik yedekleme stratejisi
+### API Dokümantasyonu
+- Gelişmiş OpenAPI/Swagger dokümantasyonu
+- Request/Response örnekleri
+- HTTP durum kodları
+- Endpoint açıklamaları
 
-## 📱 Kullanıcı Deneyimi
-- [ ] Progressive Web App (PWA)
-- [ ] Karanlık tema desteği
-- [ ] Çoklu dil desteği
-- [ ] Gelişmiş arama ve filtreleme
+### Test Altyapısı
+- Pytest ile birim testleri
+- Entegrasyon testleri
+- API testleri
+- Test kapsamı (Coverage) raporları
+
+---
+
+## Planlanan Belediye Modülleri
+
+### Talep Takip Numarası
+- Otomatik benzersiz başvuru numarası oluşturma
+- Takip numarası ile sorgulama desteği
+
+### SLA (Service Level Agreement) Sistemi
+- Kategori bazlı çözüm süreleri
+- Süresi geçen talepler için otomatik uyarılar
+- SLA ihlal raporları
+- Öncelik yönetimi
+
+### Mahalle Bazlı Analiz
+- Mahalle bazlı talep istatistikleri
+- Isı haritası (Heatmap)
+- Ortalama çözüm süreleri
+- Bölgesel analiz ekranları
+
+### Personel Performans Sistemi
+- Çözülen talep sayısı
+- Ortalama çözüm süresi
+- Bekleyen talepler
+- Performans puanlaması
+
+### Vatandaş Memnuniyet Sistemi
+- Talep sonrası puanlama
+- Kullanıcı geri bildirimleri
+- Ortalama memnuniyet analizi
+- Personel değerlendirme raporları
+
+### AI Destekli Otomatik Yönlendirme
+- Şikayet metninin yapay zekâ ile analiz edilmesi
+- Otomatik kategori belirleme
+- Öncelik seviyesinin tespiti
+- İlgili müdürlüğe otomatik yönlendirme
+
 
 ## Güvenlik mimari
 
