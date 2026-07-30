@@ -1,6 +1,6 @@
 import enum
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime, Enum, Float, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import UUID
@@ -102,6 +102,12 @@ class Talep(Base):
         DateTime(timezone=True), nullable=True
     )
 
+    # SLA: kategorinin sla_saat değerine göre talep oluşturulurken hesaplanan
+    # azami çözüm tarihi.
+    son_cozum_tarihi: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
     olusturulma_tarihi: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
@@ -145,6 +151,23 @@ class Talep(Base):
     atamalar = relationship(
         "Atama", back_populates="talep", cascade="all, delete-orphan"
     )
+
+    memnuniyet = relationship(
+        "Memnuniyet", back_populates="talep", uselist=False, cascade="all, delete-orphan"
+    )
+
+    @property
+    def gecikti_mi(self) -> bool:
+        """
+        SLA süresi geçmiş mi?
+        Çözülen/kapatılan talepler için çözüm tarihi son_cozum_tarihi ile,
+        açık talepler için şu anki zaman son_cozum_tarihi ile karşılaştırılır.
+        """
+        if self.son_cozum_tarihi is None:
+            return False
+        if self.durum in (TalepDurumu.COZULDU, TalepDurumu.KAPATILDI):
+            return self.cozulme_tarihi is not None and self.cozulme_tarihi > self.son_cozum_tarihi
+        return datetime.now(timezone.utc) > self.son_cozum_tarihi
 
     def __repr__(self) -> str:
         return f"<Talep {self.takip_no} - {self.baslik}>"

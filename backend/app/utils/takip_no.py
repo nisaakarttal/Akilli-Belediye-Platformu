@@ -1,4 +1,4 @@
-"""Talep takip numarası üretimi (ör. KAP-2026-00042)."""
+"""Talep takip numarası üretimi (ör. BLD-2026-000042)."""
 
 import re
 from datetime import datetime
@@ -11,7 +11,7 @@ from app.models.talep import Talep
 def takip_no_uret(db: Session) -> str:
     """
     İçinde bulunulan yıl için bir sonraki sıralı takip numarasını üretir.
-    Format: KAP-{YIL}-{5 haneli sıra numarası}
+    Format: BLD-{YIL}-{6 haneli sıra numarası}
 
     Not: Yüksek eşzamanlılık senaryolarında (aynı anda çok sayıda talep
     oluşturulması) küçük bir çakışma riski vardır; üretim ortamında bu,
@@ -19,7 +19,7 @@ def takip_no_uret(db: Session) -> str:
     güçlendirilebilir.
     """
     yil = datetime.now().year
-    onek = f"KAP-{yil}-"
+    onek = f"BLD-{yil}-"
 
     son_kayit = (
         db.query(Talep)
@@ -34,4 +34,4 @@ def takip_no_uret(db: Session) -> str:
         eslesme = re.search(r"(\d+)$", son_kayit.takip_no)
         sira = int(eslesme.group(1)) + 1 if eslesme else 1
 
-    return f"{onek}{sira:05d}"
+    return f"{onek}{sira:06d}"

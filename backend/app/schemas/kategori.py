@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 
@@ -9,6 +10,7 @@ class KategoriOlusturIstegi(BaseModel):
     ikon: str | None = Field(None, max_length=100)
     sorumlu_departman: str = Field(..., min_length=2, max_length=150)
     renk: str = Field("#2563EB", max_length=20)
+    sla_saat: int = Field(72, ge=1, le=720, description="Bu kategorideki talebin çözülmesi beklenen azami süre (saat)")
 
 
 class KategoriGuncelleIstegi(BaseModel):
@@ -17,6 +19,7 @@ class KategoriGuncelleIstegi(BaseModel):
     ikon: str | None = Field(None, max_length=100)
     sorumlu_departman: str | None = Field(None, min_length=2, max_length=150)
     renk: str | None = Field(None, max_length=20)
+    sla_saat: int | None = Field(None, ge=1, le=720)
 
 
 class KategoriYaniti(BaseModel):
@@ -26,5 +29,8 @@ class KategoriYaniti(BaseModel):
     ikon: str | None
     sorumlu_departman: str
     renk: str
+    sla_saat: int
+    silindi_mi: bool
+    silinme_tarihi: datetime | None
 
     model_config = {"from_attributes": True}

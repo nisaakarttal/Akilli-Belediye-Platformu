@@ -2,17 +2,52 @@
 
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import gecerli_kullanicial
 from app.core.database import get_db
+from app.core.security import tokeni_coz
+from app.core.ws_manager import baglanti_yoneticisi
 from app.models.bildirim import Bildirim
 from app.models.kullanici import Kullanici
 from app.schemas.bildirim import BildirimYaniti
 from app.schemas.ortak import MesajYaniti
 
 router = APIRouter()
+
+
+@router.websocket("/ws")
+async def bildirim_websocket(websocket: WebSocket, token: str):
+    """
+    Gerçek zamanlı bildirim kanalı (kullanıcı bazlı).
+    Bağlantı `?token=<JWT erişim tokeni>` sorgu parametresiyle doğrulanır;
+    her kullanıcı yalnızca kendi bildirimlerini bu kanaldan alır.
+    """
+    payload = tokeni_coz(token)
+    if payload is None or payload.get("tip") != "erisim":
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    kullanici_id_str = payload.get("sub")
+    if kullanici_id_str is None:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    try:
+        kullanici_id = uuid.UUID(kullanici_id_str)
+    except ValueError:
+        await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
+        return
+
+    await baglanti_yoneticisi.baglan(kullanici_id, websocket)
+    try:
+        while True:
+            # Bağlantıyı canlı tutmak için istemciden gelen mesajları bekler
+            # (istemci genellikle periyodik "ping" gönderir); içerik kullanılmaz.
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        baglanti_yoneticisi.baglantiyi_kes(kullanici_id, websocket)
 
 
 @router.get("/", response_model=list[BildirimYaniti])

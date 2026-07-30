@@ -12,6 +12,7 @@ from app.models.talep import Talep, TalepDurumu, TalepOnceligi
 from app.models.talep_dosyasi import TalepDosyasi, DosyaTuru
 from app.models.durum_gecmisi import DurumGecmisi
 from app.models.atama import Atama
+from app.models.memnuniyet import Memnuniyet
 from app.models.bildirim import Bildirim, BildirimTuru
 from app.models.ai_kaydi import AiKaydi
 from app.models.aktivite_kaydi import AktiviteKaydi
@@ -32,6 +33,7 @@ __all__ = [
     "DosyaTuru",
     "DurumGecmisi",
     "Atama",
+    "Memnuniyet",
     "Bildirim",
     "BildirimTuru",
     "AiKaydi",

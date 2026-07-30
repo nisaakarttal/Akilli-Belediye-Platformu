@@ -3,7 +3,7 @@
 import os
 from datetime import datetime, timezone, timedelta
 from app.models.login_log import LoginLog
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.models.refresh_token import RefreshToken
@@ -36,10 +36,9 @@ from app.core.security import (
     email_dogrulama_tokeni_olustur,
 )
 
-from app.services.eposta_servisi import (
-    sifre_sifirlama_epostasi_gonder,
-    email_dogrulama_epostasi_gonder,
-
+from app.services.arkaplan_gorevleri import (
+    arka_planda_email_dogrulama_epostasi_gonder,
+    arka_planda_sifre_sifirlama_epostasi_gonder,
 )
 
 ayarlar = get_settings()
@@ -87,8 +86,11 @@ def login_log_kaydet(
     response_model=MesajYaniti,
     status_code=status.HTTP_201_CREATED
 )
+@limiter.limit("10/hour")
 def kayit_ol(
+    request: Request,
     istek: KullaniciKayitIstegi,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     """Yeni vatandaş hesabı oluşturur."""
@@ -154,11 +156,12 @@ def kayit_ol(
     )
 
 
-    # Doğrulama maili gönderme
-    email_dogrulama_epostasi_gonder(
+    # Doğrulama maili arka planda gönderilir (isteği bloklamaz)
+    background_tasks.add_task(
+        arka_planda_email_dogrulama_epostasi_gonder,
         yeni_kullanici.e_posta,
         yeni_kullanici.ad,
-        dogrulama_linki
+        dogrulama_linki,
     )
 
     return MesajYaniti(
@@ -428,6 +431,7 @@ def token_yenile(
 def sifremi_unuttum(
     request: Request,
     istek: SifremiUnuttumIstegi,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
 
@@ -453,7 +457,8 @@ def sifremi_unuttum(
         )
 
 
-        sifre_sifirlama_epostasi_gonder(
+        background_tasks.add_task(
+            arka_planda_sifre_sifirlama_epostasi_gonder,
             kullanici.e_posta,
             kullanici.ad,
             baglanti

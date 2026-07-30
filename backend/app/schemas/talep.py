@@ -80,6 +80,8 @@ class TalepListeYaniti(BaseModel):
     oncelik: TalepOnceligi
     kategori: KategoriYaniti
     mahalle: MahalleYaniti
+    son_cozum_tarihi: datetime | None
+    gecikti_mi: bool
     olusturulma_tarihi: datetime
 
     model_config = {"from_attributes": True}
@@ -102,6 +104,8 @@ class TalepDetayYaniti(BaseModel):
     olusturan: TalepOlusturanYaniti
     cozum_notu: str | None
     cozulme_tarihi: datetime | None
+    son_cozum_tarihi: datetime | None
+    gecikti_mi: bool
     olusturulma_tarihi: datetime
     guncellenme_tarihi: datetime
     dosyalar: list[TalepDosyaYaniti]

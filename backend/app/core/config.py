@@ -71,6 +71,15 @@ class Ayarlar(BaseSettings):
 
 
     # ==========================
+    # Redis (Cache)
+    # ==========================
+
+    REDIS_URL: str = "redis://localhost:6379/0"
+
+    CACHE_VARSAYILAN_SURE_SANIYE: int = 300
+
+
+    # ==========================
     # Dosya Yükleme
     # ==========================
 

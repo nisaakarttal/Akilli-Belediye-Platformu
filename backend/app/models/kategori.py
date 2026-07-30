@@ -1,6 +1,8 @@
 import uuid
 
-from sqlalchemy import String
+from datetime import datetime
+
+from sqlalchemy import Boolean, DateTime, Integer, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -22,6 +24,13 @@ class Kategori(Base):
     ikon: Mapped[str | None] = mapped_column(String(100), nullable=True)  # Lucide ikon adı
     sorumlu_departman: Mapped[str] = mapped_column(String(150), nullable=False)  # ör. Fen İşleri Müdürlüğü
     renk: Mapped[str] = mapped_column(String(20), default="#2563EB", nullable=False)
+
+    # SLA: bu kategorideki bir talebin çözülmesi beklenen azami süre (saat)
+    sla_saat: Mapped[int] = mapped_column(Integer, default=72, nullable=False)
+
+    # Soft delete: kayıt fiziksel olarak silinmez, pasif duruma alınır.
+    silindi_mi: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    silinme_tarihi: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     # Asıl kategori ilişkisi (1-n)
     talepler = relationship(

@@ -1,10 +1,11 @@
 """Yapay zekâ uç noktaları: şikâyet analizi ve sohbet asistanı."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
 from app.api.deps import gecerli_kullanicial
 from app.core.database import get_db
+from app.core.limiter import kullanici_limiter
 from app.models.ai_kaydi import AiKaydi
 from app.models.kullanici import Kullanici
 from app.schemas.ai import AnalizIstegi, AnalizYaniti, SohbetIstegi, SohbetYaniti
@@ -14,7 +15,9 @@ router = APIRouter()
 
 
 @router.post("/analiz-et", response_model=AnalizYaniti)
+@kullanici_limiter.limit("15/minute")
 def sikayeti_analiz_et(
+    request: Request,
     istek: AnalizIstegi,
     db: Session = Depends(get_db),
     kullanici: Kullanici = Depends(gecerli_kullanicial),
@@ -38,7 +41,9 @@ def sikayeti_analiz_et(
 
 
 @router.post("/sohbet", response_model=SohbetYaniti)
+@kullanici_limiter.limit("20/minute")
 def sohbet_et(
+    request: Request,
     istek: SohbetIstegi,
     db: Session = Depends(get_db),
     kullanici: Kullanici = Depends(gecerli_kullanicial),

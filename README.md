@@ -75,138 +75,83 @@ Proje kapsamında aşağıdaki güvenlik önlemleri uygulanmıştır:
 
 ## 🚀 Sıradaki Güvenlik Geliştirmeleri
 
-⭐ Admin kullanıcıları için 2FA (Two-Factor Authentication) desteği eklenmesi  
+⭐ Admin kullanıcıları için 2FA (Two-Factor Authentication) desteği eklenmesi
 
-## Planlanan Geliştirmeler
+
+## Son Güncellemeler
+
+Bu sürümde proje kapsamı genişletilmiş ve aşağıdaki özellikler eklenmiştir:
+
+### Talep Yönetimi
+- Talep takip numarası sistemi eklendi.
+- Benzersiz takip numarası ile talep sorgulama desteği sağlandı.
+- SLA (Hizmet Seviyesi Anlaşması) altyapısı oluşturuldu.
+- Kategori bazlı çözüm süreleri tanımlandı.
+- Geciken taleplerin tespit edilmesi ve listelenmesi sağlandı.
+
+### Analiz ve Raporlama
+- Mahalle bazlı talep analizleri eklendi.
+- En çok şikâyet alınan mahalleler raporlanabiliyor.
+- Ortalama çözüm süresi hesaplanıyor.
+- Kategori dağılımı istatistikleri oluşturuldu.
+- Dashboard için JSON tabanlı istatistik endpointleri geliştirildi.
+
+### Personel Performansı
+- Personel bazlı çözülen ve bekleyen talep sayıları hesaplanıyor.
+- Ortalama çözüm süresi ve tamamlanma oranı hesaplanıyor.
+- Performans puanlama sistemi eklendi.
+- Admin paneli için performans raporlama endpointleri oluşturuldu.
+
+### Vatandaş Memnuniyeti
+- Tamamlanan talepler için 1–5 yıldız puanlama sistemi eklendi.
+- Vatandaş yorumları desteklendi.
+- Her talebin yalnızca bir kez değerlendirilmesi sağlandı.
+- Personel ve kategori bazlı ortalama memnuniyet hesaplanabiliyor.
+
+### Sistem İyileştirmeleri
+- Redis tabanlı önbellekleme (Caching) desteği eklendi.
+- WebSocket ile gerçek zamanlı bildirim altyapısı geliştirildi.
+- Background Tasks kullanılarak e-posta ve dosya işlemleri optimize edildi.
+- SlowAPI ile IP ve kullanıcı bazlı Rate Limiting eklendi.
+- APScheduler ile zamanlanmış görev altyapısı oluşturuldu.
+- API Versioning (`/api/v2`) desteği eklendi.
+- Soft Delete desteği ile kategori yönetimi geliştirildi.
+- Audit Log sistemi ile yönetici işlemleri kayıt altına alındı.
+- Test altyapısı (Pytest) oluşturularak temel API testleri eklendi.
+- OpenAPI dokümantasyonu ve uygulama yaşam döngüsü (startup/shutdown) iyileştirildi.
+
+## Yapılacaklar
 
 ### Gerçek Zamanlı Bildirim Sistemi
-- WebSocket tabanlı anlık bildirim altyapısı
-- Kullanıcı bazlı bildirim kanalları
-- Okundu/okunmadı durumu
-- Gerçek zamanlı bildirim gönderimi
-- Bildirim geçmişi
+- Bildirimlerde okundu/okunmadı durumu
+- Bildirim geçmişi yönetimi
 
-### Zamanlanmış Görevler (Scheduler)
-- APScheduler/Celery entegrasyonu
-- Süresi geçen taleplerin otomatik kontrolü
-- Cevaplanmayan başvurular için hatırlatma
-- Periyodik sistem görevleri
+### Zamanlanmış Görevler
+- Süresi geçen talepler için otomatik uyarılar
+- Cevaplanmayan başvurular için otomatik hatırlatma
 - Otomatik rapor oluşturma
 
-### Audit Log Sistemi
-- Yönetici işlemlerinin kayıt altına alınması
-- Kullanıcı ve kategori değişikliklerinin loglanması
-- İşlem geçmişi görüntüleme
-- Detaylı sistem kayıtları
-
-### API Rate Limiting
-- API istek sınırlandırması
-- IP ve kullanıcı bazlı rate limit
-- Hassas endpointler için özel limitler
-- Rate limit ihlali kayıtları
-
-### Soft Delete Desteği
-- Silinen kayıtların pasif duruma alınması
-- Geri yükleme desteği
-- Kalıcı silme işlemleri
-- Veri bütünlüğünün korunması
-
-### Redis Cache
-- Dashboard verilerinin önbelleğe alınması
-- Kategori ve mahalle bilgilerinin cachelenmesi
-- Performans optimizasyonu
-- Cache yönetimi
-
-### Background Task Sistemi
-- Arka planda AI analizleri
-- Dosya işleme görevleri
-- E-posta gönderimleri
-- Uzun süren işlemlerin asenkron yürütülmesi
-
-### API Versioning
-- `/api/v1` ve `/api/v2` desteği
-- Geriye dönük uyumluluk
-- Sürüm bazlı endpoint yönetimi
-
 ### API Dokümantasyonu
-- Gelişmiş OpenAPI/Swagger dokümantasyonu
-- Request/Response örnekleri
-- HTTP durum kodları
-- Endpoint açıklamaları
+- Request/Response örneklerinin genişletilmesi
+- Endpoint açıklamalarının detaylandırılması
 
 ### Test Altyapısı
-- Pytest ile birim testleri
-- Entegrasyon testleri
-- API testleri
-- Test kapsamı (Coverage) raporları
+- Test kapsamının (Coverage) artırılması
+- Daha kapsamlı entegrasyon testleri
 
----
+### Mahalle Bazlı Analiz
+- Isı haritası (Heatmap) desteği
+- Bölgesel analiz ekranları
 
-## Planlanan Belediye Modülleri
-
-### Talep Takip Numarası
-- Otomatik benzersiz başvuru numarası oluşturma
-- Takip numarası ile sorgulama desteği
-
-### SLA (Service Level Agreement) Sistemi
-- Kategori bazlı çözüm süreleri
-- Süresi geçen talepler için otomatik uyarılar
+### SLA Sistemi
 - SLA ihlal raporları
 - Öncelik yönetimi
 
-### Mahalle Bazlı Analiz
-- Mahalle bazlı talep istatistikleri
-- Isı haritası (Heatmap)
-- Ortalama çözüm süreleri
-- Bölgesel analiz ekranları
-
-### Personel Performans Sistemi
-- Çözülen talep sayısı
-- Ortalama çözüm süresi
-- Bekleyen talepler
-- Performans puanlaması
-
-### Vatandaş Memnuniyet Sistemi
-- Talep sonrası puanlama
-- Kullanıcı geri bildirimleri
-- Ortalama memnuniyet analizi
-- Personel değerlendirme raporları
-
 ### AI Destekli Otomatik Yönlendirme
-- Şikayet metninin yapay zekâ ile analiz edilmesi
+- Şikâyet metninin yapay zekâ ile analiz edilmesi
 - Otomatik kategori belirleme
-- Öncelik seviyesinin tespiti
+- Öncelik seviyesinin belirlenmesi
 - İlgili müdürlüğe otomatik yönlendirme
-
-
-## Güvenlik mimari
-
-Kullanıcı
-   |
-   |
-Login isteği
-   |
-   |
-Rate Limit
-(5/dk IP)
-   |
-   |
-Kullanıcı kontrolü
-   |
-   |
-Şifre kontrolü
-   |
-   |
-Başarısız mı?
-   |
-   |
-Sayaç artır
-   |
-   |
-5 kere oldu mu?
-   |
-   |
-15 dk hesap kilidi
 
 ## 📄 Lisans
 

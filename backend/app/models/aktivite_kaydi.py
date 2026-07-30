@@ -17,7 +17,8 @@ class AktiviteKaydi(Base):
     __tablename__ = "aktivite_kayitlari"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    kullanici_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("kullanicilar.id"), nullable=False)
+    # Sistem tarafından (zamanlanmış görev vb.) oluşturulan kayıtlarda kullanici_id NULL olabilir.
+    kullanici_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("kullanicilar.id"), nullable=True)
 
     eylem: Mapped[str] = mapped_column(String(100), nullable=False)  # ör. "talep_olusturuldu", "kullanici_guncellendi"
     hedef_tablo: Mapped[str] = mapped_column(String(100), nullable=False)

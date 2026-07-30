@@ -1,13 +1,14 @@
 """Şikâyet/talep uç noktaları — sistemin merkezi işlevselliği."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, Request, UploadFile, status
 from sqlalchemy.orm import Session, joinedload
 
 from app.api.deps import gecerli_kullanicial, sadece_personel_ve_admin
 from app.core.database import get_db
+from app.core.limiter import kullanici_limiter
 from app.models.aktivite_kaydi import AktiviteKaydi
 from app.models.atama import Atama
 from app.models.bildirim import BildirimTuru
@@ -15,8 +16,10 @@ from app.models.durum_gecmisi import DurumGecmisi
 from app.models.kategori import Kategori
 from app.models.kullanici import Kullanici, KullaniciRolu
 from app.models.mahalle import Mahalle
+from app.models.memnuniyet import Memnuniyet
 from app.models.talep import Talep, TalepDurumu, TalepOnceligi
 from app.models.talep_dosyasi import DosyaTuru, TalepDosyasi
+from app.schemas.memnuniyet import MemnuniyetOlusturIstegi, MemnuniyetYaniti
 from app.schemas.ortak import SayfalanmisYanit
 from app.schemas.talep import (
     TalepAtaIstegi,
@@ -29,6 +32,7 @@ from app.schemas.talep import (
     TalepOlusturIstegi,
 )
 from app.services.bildirim_servisi import bildirim_olustur
+from app.services.arkaplan_gorevleri import arka_planda_kucuk_onizleme_olustur
 from app.utils.dosya_yardimcisi import dosya_kaydet
 from app.utils.takip_no import takip_no_uret
 from app.core.config import get_settings
@@ -58,7 +62,9 @@ def _erisim_kontrolu(talep: Talep, kullanici: Kullanici) -> None:
 
 
 @router.post("/", response_model=TalepDetayYaniti, status_code=status.HTTP_201_CREATED)
+@kullanici_limiter.limit("20/minute")
 def talep_olustur(
+    request: Request,
     istek: TalepOlusturIstegi,
     db: Session = Depends(get_db),
     kullanici: Kullanici = Depends(gecerli_kullanicial),
@@ -86,6 +92,8 @@ def talep_olustur(
         ai_onerilen_kategori_id=istek.ai_onerilen_kategori_id,
         ai_onerilen_oncelik=istek.ai_onerilen_oncelik,
         ai_guven_skoru=istek.ai_guven_skoru,
+        # SLA: kategorinin tanımlı çözüm süresine (saat) göre son çözüm tarihi
+        son_cozum_tarihi=datetime.now(timezone.utc) + timedelta(hours=kategori.sla_saat),
     )
     db.add(talep)
     db.flush()  # talep.id'yi commit etmeden önce almak için
@@ -181,6 +189,23 @@ def talepleri_haritada_goster(
     ]
 
 
+@router.get("/gecikenler", response_model=list[TalepListeYaniti])
+def geciken_talepleri_listele(
+    db: Session = Depends(get_db),
+    kullanici: Kullanici = Depends(sadece_personel_ve_admin),
+):
+    """SLA süresi (son_cozum_tarihi) geçmiş, henüz çözülmemiş/kapatılmamış talepleri listeler. Personel/yönetici."""
+    simdi = datetime.now(timezone.utc)
+    return (
+        _talep_sorgu_temel(db)
+        .filter(Talep.son_cozum_tarihi.isnot(None))
+        .filter(Talep.son_cozum_tarihi < simdi)
+        .filter(Talep.durum.notin_([TalepDurumu.COZULDU, TalepDurumu.KAPATILDI]))
+        .order_by(Talep.son_cozum_tarihi.asc())
+        .all()
+    )
+
+
 @router.get("/takip/{takip_no}", response_model=TalepDetayYaniti)
 def takip_no_ile_sorgula(takip_no: str, db: Session = Depends(get_db)):
     """Takip numarasıyla girişsiz sorgulama yapılabilir (vatandaş SMS/e-posta ile aldığı numarayla sorgular)."""
@@ -209,6 +234,7 @@ def talep_getir(
 def talep_dosyasi_yukle(
     talep_id: uuid.UUID,
     dosya_turu: DosyaTuru,
+    background_tasks: BackgroundTasks,
     dosya: UploadFile = File(...),
     db: Session = Depends(get_db),
     kullanici: Kullanici = Depends(gecerli_kullanicial),
@@ -298,6 +324,11 @@ def talep_dosyasi_yukle(
     db.add(kayit)
     db.commit()
     db.refresh(kayit)
+
+    # Fotoğraf/sonuç fotoğrafı yüklemelerinde küçük önizleme arka planda oluşturulur.
+    if dosya_turu in (DosyaTuru.FOTOGRAF, DosyaTuru.SONUC_FOTOGRAFI):
+        background_tasks.add_task(arka_planda_kucuk_onizleme_olustur, goreli_yol)
+
     return kayit
 
 
@@ -339,6 +370,69 @@ def talep_durumunu_guncelle(
 
     db.commit()
     return _talep_sorgu_temel(db).filter(Talep.id == talep_id).first()
+
+
+@router.post("/{talep_id}/memnuniyet", response_model=MemnuniyetYaniti, status_code=status.HTTP_201_CREATED)
+@kullanici_limiter.limit("10/minute")
+def memnuniyet_bildir(
+    request: Request,
+    talep_id: uuid.UUID,
+    istek: MemnuniyetOlusturIstegi,
+    db: Session = Depends(get_db),
+    kullanici: Kullanici = Depends(gecerli_kullanicial),
+):
+    """Çözülen/kapatılan bir talep için 1-5 yıldız memnuniyet puanı ve yorum bırakır. Bir talep yalnızca bir kez puanlanabilir."""
+    talep = db.query(Talep).filter(Talep.id == talep_id).first()
+    if talep is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talep bulunamadı.")
+
+    _erisim_kontrolu(talep, kullanici)
+
+    if talep.durum not in (TalepDurumu.COZULDU, TalepDurumu.KAPATILDI):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Yalnızca çözülmüş veya kapatılmış talepler değerlendirilebilir.",
+        )
+
+    mevcut = db.query(Memnuniyet).filter(Memnuniyet.talep_id == talep_id).first()
+    if mevcut is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Bu talep için zaten bir memnuniyet değerlendirmesi yapılmış.",
+        )
+
+    memnuniyet = Memnuniyet(
+        talep_id=talep.id,
+        puan=istek.puan,
+        yorum=istek.yorum,
+        olusturan_id=kullanici.id,
+    )
+    db.add(memnuniyet)
+    db.commit()
+    db.refresh(memnuniyet)
+    return memnuniyet
+
+
+@router.get("/{talep_id}/memnuniyet", response_model=MemnuniyetYaniti)
+def memnuniyet_getir(
+    talep_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    kullanici: Kullanici = Depends(gecerli_kullanicial),
+):
+    """Bir talebe ait memnuniyet değerlendirmesini döner."""
+    talep = db.query(Talep).filter(Talep.id == talep_id).first()
+    if talep is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talep bulunamadı.")
+
+    _erisim_kontrolu(talep, kullanici)
+
+    memnuniyet = db.query(Memnuniyet).filter(Memnuniyet.talep_id == talep_id).first()
+    if memnuniyet is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Bu talep için henüz bir memnuniyet değerlendirmesi yapılmamış.",
+        )
+    return memnuniyet
 
 
 @router.post("/{talep_id}/ata", response_model=TalepDetayYaniti)
