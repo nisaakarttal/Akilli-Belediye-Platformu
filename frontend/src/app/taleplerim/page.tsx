@@ -9,7 +9,7 @@ import { Altbilgi } from "@/components/layout/altbilgi";
 import { Basli } from "@/components/layout/basli";
 import { KorumaliRota } from "@/components/layout/korumali-rota";
 import { TalepKarti } from "@/components/sikayet/talep-karti";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartIcerik } from "@/components/ui/card";
 import { Secim } from "@/components/ui/select";
 import { FadeIn, FadeInStagger, StaggerOgesi } from "@/components/ui/animasyon";
@@ -53,14 +53,14 @@ function TaleplerimIcerik() {
             </div>
 
             <Link href="/sikayet-olustur">
-              <Dugme
+              <Button
                 varyant="birincil"
                 boyut="normal"
                 className="gap-2 shadow-lg shadow-birincil-600/20 transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0"
               >
                 <Plus size={18} aria-hidden="true" />
                 <span>Yeni Talep Oluştur</span>
-              </Dugme>
+              </Button>
             </Link>
           </div>
 
@@ -102,10 +102,10 @@ function TaleplerimIcerik() {
                     <p className="text-xs text-metin-ikincil">Çözülmesini istediğiniz mahalli sorunları bildirmek için ilk adımı atın.</p>
                   </div>
                   <Link href="/sikayet-olustur" className="pt-2">
-                    <Dugme varyant="birincil" className="gap-2 shadow-md shadow-birincil-600/20">
+                    <Button varyant="birincil" className="gap-2 shadow-md shadow-birincil-600/20">
                       <Sparkles size={16} />
                       <span>İlk Talebinizi Oluşturun</span>
-                    </Dugme>
+                    </Button>
                   </Link>
                 </KartIcerik>
               </Kart>

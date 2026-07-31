@@ -1,6 +1,6 @@
 import { Loader2, Mail, Phone, ShieldCheck, ShieldOff } from "lucide-react";
 
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartIcerik } from "@/components/ui/card";
 import { Secim } from "@/components/ui/select";
 import { ROL_ETIKETI, ROL_VURGU } from "@/constants/kullanici";
@@ -115,7 +115,7 @@ export function KullaniciSatiri({
             )}
           </div>
 
-          <Dugme
+          <Button
             varyant={kullanici.aktif_mi ? "anahat" : "birincil"}
             boyut="kucuk"
             disabled={durumGuncelleniyorMu}
@@ -133,7 +133,7 @@ export function KullaniciSatiri({
               <ShieldCheck size={14} aria-hidden="true" />
             )}
             <span>{kullanici.aktif_mi ? "Pasife Al" : "Etkinleştir"}</span>
-          </Dugme>
+          </Button>
         </div>
       </KartIcerik>
     </Kart>

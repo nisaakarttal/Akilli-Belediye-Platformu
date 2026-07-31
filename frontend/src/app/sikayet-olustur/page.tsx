@@ -10,7 +10,7 @@ import { Basli } from "@/components/layout/basli";
 import { KorumaliRota } from "@/components/layout/korumali-rota";
 import { AiOneriKarti } from "@/components/sikayet/ai-oneri-karti";
 import { DosyaSecici } from "@/components/sikayet/dosya-yukleme";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { FormAlani } from "@/components/ui/form-alani";
 import { Girdi } from "@/components/ui/input";
@@ -210,7 +210,7 @@ function SikayetOlusturIcerik() {
                               <p className="text-xs text-metin-ikincil">Sorununuzu yazıp analiz ettirerek otomatik kategori önerisi alın.</p>
                             </div>
                           </div>
-                          <Dugme
+                          <Button
                             type="button"
                             varyant="cam"
                             boyut="kucuk"
@@ -220,11 +220,11 @@ function SikayetOlusturIcerik() {
                           >
                             {aiAnalizEdiliyor ? <Loader2 size={15} className="animate-spin" /> : <Sparkles size={15} />}
                             <span>{aiAnalizEdiliyor ? "Analiz Ediliyor..." : "Analiz Et"}</span>
-                          </Dugme>
+                          </Button>
                         </div>
 
                         <FormAlani id="baslik" etiket="Başlık" hata={errors.baslik?.message}>
-                          <Girdi
+                          <Input
                             id="baslik"
                             placeholder="Örn: Sokak lambası yanmıyor"
                             aria-invalid={!!errors.baslik}
@@ -310,7 +310,7 @@ function SikayetOlusturIcerik() {
                           </FormAlani>
 
                           <FormAlani id="adres_detay" etiket="Adres Detayı (İsteğe Bağlı)">
-                            <Girdi id="adres_detay" placeholder="Cadde, sokak, kapı no..." className="transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20" {...register("adres_detay")} />
+                            <Input id="adres_detay" placeholder="Cadde, sokak, kapı no..." className="transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20" {...register("adres_detay")} />
                           </FormAlani>
                         </div>
 
@@ -359,7 +359,7 @@ function SikayetOlusturIcerik() {
                   {/* Adım Kontrol Butonları */}
                   <div className="flex items-center justify-between pt-4 border-t border-kenarlik/60">
                     {aktifAdim > 1 ? (
-                      <Dugme
+                      <Button
                         type="button"
                         varyant="cam"
                         boyut="normal"
@@ -368,13 +368,13 @@ function SikayetOlusturIcerik() {
                       >
                         <ChevronLeft size={16} />
                         <span>Geri</span>
-                      </Dugme>
+                      </Button>
                     ) : (
                       <div />
                     )}
 
                     {aktifAdim < 3 ? (
-                      <Dugme
+                      <Button
                         type="button"
                         varyant="birincil"
                         boyut="normal"
@@ -383,9 +383,9 @@ function SikayetOlusturIcerik() {
                       >
                         <span>İleri</span>
                         <ChevronRight size={16} />
-                      </Dugme>
+                      </Button>
                     ) : (
-                      <Dugme
+                      <Button
                         type="submit"
                         varyant="birincil"
                         boyut="buyuk"
@@ -403,7 +403,7 @@ function SikayetOlusturIcerik() {
                             <span>Talebi Kesin Olarak Gönder</span>
                           </>
                         )}
-                      </Dugme>
+                      </Button>
                     )}
                   </div>
 

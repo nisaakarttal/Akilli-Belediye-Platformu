@@ -5,19 +5,19 @@ import { MapPin, MessageSquarePlus, Search } from "lucide-react";
 import Link from "next/link";
 
 import { PikselSehir } from "@/components/home/piksel/piksel-sehir";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 const KART_VARYANTI: Variants = {
   gizli: { opacity: 0, y: 20 },
   gorunur: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-const DUGME_GRUBU_VARYANTI: Variants = {
+const Button_GRUBU_VARYANTI: Variants = {
   gizli: {},
   gorunur: { transition: { staggerChildren: 0.08, delayChildren: 0.3 } },
 };
 
-const DUGME_VARYANTI: Variants = {
+const Button_VARYANTI: Variants = {
   gizli: { opacity: 0, y: 12 },
   gorunur: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
 };
@@ -49,33 +49,33 @@ export function Hero() {
             <motion.div
               initial="gizli"
               animate="gorunur"
-              variants={DUGME_GRUBU_VARYANTI}
+              variants={Button_GRUBU_VARYANTI}
               className="mt-6 flex flex-wrap items-center justify-center gap-3"
             >
-              <motion.div variants={DUGME_VARYANTI}>
+              <motion.div variants={Button_VARYANTI}>
                 <Link href="/sikayet-olustur">
-                  <Dugme varyant="birincil" boyut="buyuk" className="gap-2">
+                  <Button varyant="birincil" boyut="buyuk" className="gap-2">
                     <MessageSquarePlus size={20} aria-hidden="true" />
                     Hızlı Şikâyet Oluştur
-                  </Dugme>
+                  </Button>
                 </Link>
               </motion.div>
 
-              <motion.div variants={DUGME_VARYANTI}>
+              <motion.div variants={Button_VARYANTI}>
                 <Link href="/taleplerim">
-                  <Dugme varyant="cam" boyut="buyuk" className="gap-2">
+                  <Button varyant="cam" boyut="buyuk" className="gap-2">
                     <Search size={20} aria-hidden="true" />
                     Talep Takip Et
-                  </Dugme>
+                  </Button>
                 </Link>
               </motion.div>
 
-              <motion.div variants={DUGME_VARYANTI}>
+              <motion.div variants={Button_VARYANTI}>
                 <Link href="/harita">
-                  <Dugme varyant="hayalet" boyut="buyuk" className="gap-2">
+                  <Button varyant="hayalet" boyut="buyuk" className="gap-2">
                     <MapPin size={20} aria-hidden="true" />
                     Haritada Gör
-                  </Dugme>
+                  </Button>
                 </Link>
               </motion.div>
             </motion.div>

@@ -9,7 +9,7 @@ import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 
 import { KimlikKarti } from "@/components/layout/kimlik-karti";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { FormAlani } from "@/components/ui/form-alani";
 import { SifreGirdisi } from "@/components/ui/sifre-girdisi";
 import { Uyari } from "@/components/ui/uyari";
@@ -108,10 +108,10 @@ function SifreSifirlaIcerik() {
               />
             </FormAlani>
 
-            <Dugme type="submit" varyant="birincil" boyut="buyuk" className="w-full gap-2" disabled={gonderiliyor}>
+            <Button type="submit" varyant="birincil" boyut="buyuk" className="w-full gap-2" disabled={gonderiliyor}>
               {gonderiliyor && <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />}
               {gonderiliyor ? "Kaydediliyor..." : "Şifreyi Güncelle"}
-            </Dugme>
+            </Button>
           </form>
         )
       )}

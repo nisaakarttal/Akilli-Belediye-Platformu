@@ -1,6 +1,6 @@
 import { Building2, Pencil, Trash2 } from "lucide-react";
 
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart } from "@/components/ui/card";
 import { VARSAYILAN_KATEGORI_RENGI } from "@/constants/kategori";
 import type { Kategori } from "@/types";
@@ -36,7 +36,7 @@ export function KategoriKarti({ kategori, onDuzenle, onSil, silinebilirMi }: Kat
           </div>
 
           <div className="flex items-center gap-1 rounded-xl border border-kenarlik/80 bg-zemin/60 backdrop-blur-md p-1 shadow-sm">
-            <Dugme
+            <Button
               varyant="hayalet"
               boyut="simge"
               className="h-8 w-8 text-metin-ikincil hover:text-metin hover:bg-black/5 dark:hover:bg-white/5"
@@ -44,8 +44,8 @@ export function KategoriKarti({ kategori, onDuzenle, onSil, silinebilirMi }: Kat
               aria-label={`${kategori.ad} kategorisini düzenle`}
             >
               <Pencil size={15} aria-hidden="true" />
-            </Dugme>
-            <Dugme
+            </Button>
+            <Button
               varyant="hayalet"
               boyut="simge"
               className="h-8 w-8 text-metin-ikincil hover:bg-tehlike/15 hover:text-tehlike"
@@ -54,7 +54,7 @@ export function KategoriKarti({ kategori, onDuzenle, onSil, silinebilirMi }: Kat
               aria-label={`${kategori.ad} kategorisini sil`}
             >
               <Trash2 size={15} aria-hidden="true" />
-            </Dugme>
+            </Button>
           </div>
         </div>
 

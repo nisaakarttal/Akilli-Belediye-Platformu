@@ -1,7 +1,7 @@
 import { AlertCircle, Sparkles } from "lucide-react";
 
 import { OncelikRozeti } from "@/components/sikayet/oncelik-rozeti";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import type { AnalizYaniti } from "@/types";
 
 export function AiOneriKarti({
@@ -49,9 +49,9 @@ export function AiOneriKarti({
       )}
 
       {analiz.onerilen_kategori_adi && (
-        <Dugme type="button" varyant="anahat" boyut="kucuk" onClick={onUygula} disabled={uygulandiMi}>
+        <Button type="button" varyant="anahat" boyut="kucuk" onClick={onUygula} disabled={uygulandiMi}>
           {uygulandiMi ? "Öneri Uygulandı" : "Öneriyi Uygula"}
-        </Dugme>
+        </Button>
       )}
     </div>
   );

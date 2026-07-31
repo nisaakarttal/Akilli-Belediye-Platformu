@@ -19,3 +19,10 @@ frontend/next-env.d.ts
 .vscode/
 .idea/
 .DS_Store
+
+node_modules
+.next
+out
+.env.local
+.env*.local
+*.log

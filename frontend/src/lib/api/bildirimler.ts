@@ -1,14 +1,15 @@
-import { api } from "@/lib/api";
+import { apiClient } from "./client";
 import type { Bildirim } from "@/types";
 
-export const bildirimlerApi = {
-  listele: (sadeceOkunmamis = false) =>
-    api.get<Bildirim[]>("/bildirimler/", { params: { sadece_okunmamis: sadeceOkunmamis } }).then((r) => r.data),
+export async function bildirimleriListele(): Promise<Bildirim[]> {
+  const { data } = await apiClient.get<Bildirim[]>("/bildirimler");
+  return data;
+}
 
-  okunduYap: (id: string) => api.put<{ mesaj: string }>(`/bildirimler/${id}/okundu`).then((r) => r.data),
+export async function bildirimiOkunduYap(id: string): Promise<void> {
+  await apiClient.put(`/bildirimler/${id}/okundu`);
+}
 
-  // Okunmadı olarak işaretleme metodu
-  okunmadiYap: (id: string) => api.put<{ mesaj: string }>(`/bildirimler/${id}/okunmadi`).then((r) => r.data),
-
-  tumunuOkunduYap: () => api.put<{ mesaj: string }>("/bildirimler/tumunu-okundu-yap").then((r) => r.data),
-};
+export async function tumBildirimleriOkunduYap(): Promise<void> {
+  await apiClient.put("/bildirimler/tumunu-okundu-yap");
+}

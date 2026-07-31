@@ -2,70 +2,77 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   darkMode: "class",
-  content: [
-    "./src/**/*.{ts,tsx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
+    container: {
+      center: true,
+      padding: "1.5rem",
+      screens: { "2xl": "1360px" }
+    },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-manrope)", "system-ui", "sans-serif"]
+      },
       colors: {
-        // Belediye kimlik renkleri
-        birincil: {
-          DEFAULT: "#2563EB",
-          50: "#EFF6FF",
-          100: "#DBEAFE",
-          500: "#2563EB",
-          600: "#1D4ED8",
-          700: "#1E40AF",
+        background: "hsl(var(--background))",
+        surface: "hsl(var(--surface))",
+        foreground: "hsl(var(--foreground))",
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))"
         },
-        ikincil: {
-          DEFAULT: "#0EA5E9",
-          500: "#0EA5E9",
+        border: "hsl(var(--border))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+          50: "#eef4fb",
+          100: "#d7e6f5",
+          200: "#aecceb",
+          300: "#7fb0df",
+          400: "#4a8ecd",
+          500: "#1f6cb3",
+          600: "#125294",
+          700: "#0f4c81",
+          800: "#0c3a63",
+          900: "#0a2c4a",
+          950: "#071d31"
         },
-        basarili: "#22C55E",
-        uyari: "#F59E0B",
-        tehlike: "#EF4444",
-        "zemin-acik": "#F8FAFC",
-        "zemin-koyu": "#0F172A",
-        // CSS değişkeni tabanlı, karanlık/aydınlık moda göre otomatik değişen renkler
-        // (bkz. src/styles/globals.css içindeki :root ve .dark tanımları)
-        zemin: "rgb(var(--zemin) / <alpha-value>)",
-        "zemin-ikincil": "rgb(var(--zemin-ikincil) / <alpha-value>)",
-        metin: "rgb(var(--metin) / <alpha-value>)",
-        "metin-ikincil": "rgb(var(--metin-ikincil) / <alpha-value>)",
-        kenarlik: "rgb(var(--kenarlik) / <alpha-value>)",
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))"
+        },
+        success: { DEFAULT: "#2e7d32", bg: "#e7f5e8" },
+        warning: { DEFAULT: "#c77700", bg: "#fdf1de" },
+        danger: { DEFAULT: "#c62839", bg: "#fbe7e9" },
+        info: { DEFAULT: "#1e88d5", bg: "#e6f2fb" },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          active: "hsl(var(--sidebar-active))"
+        }
       },
       borderRadius: {
         xl: "1rem",
-        "2xl": "1.5rem",
-        "3xl": "2rem",
-      },
-      backdropBlur: {
-        xs: "2px",
+        "2xl": "1.25rem",
+        "3xl": "1.75rem"
       },
       boxShadow: {
-        cam: "0 8px 32px 0 rgba(31, 38, 135, 0.15)",
-        "cam-koyu": "0 8px 32px 0 rgba(0, 0, 0, 0.35)",
+        card: "0 1px 2px rgba(15, 30, 60, 0.04), 0 8px 24px -8px rgba(15, 30, 60, 0.10)",
+        "card-hover": "0 4px 10px rgba(15, 30, 60, 0.06), 0 16px 32px -12px rgba(15, 30, 60, 0.16)",
+        nav: "0 1px 0 rgba(15, 30, 60, 0.06)"
       },
       keyframes: {
-        "bulut-kaydir": {
-          "0%": { transform: "translateX(-10%)" },
-          "100%": { transform: "translateX(110%)" },
-        },
-        "yumusak-yukari": {
-          "0%": { opacity: "0", transform: "translateY(12px)" },
-          "100%": { opacity: "1", transform: "translateY(0)" },
-        },
+        "fade-up": { "0%": { opacity: "0", transform: "translateY(8px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
+        "scale-in": { "0%": { opacity: "0", transform: "scale(0.97)" }, "100%": { opacity: "1", transform: "scale(1)" } }
       },
       animation: {
-        "bulut-kaydir-yavas": "bulut-kaydir 60s linear infinite",
-        "bulut-kaydir-hizli": "bulut-kaydir 35s linear infinite",
-        "arac-kaydir-yavas": "bulut-kaydir 22s linear infinite",
-        "arac-kaydir-hizli": "bulut-kaydir 16s linear infinite",
-        "yumusak-yukari": "yumusak-yukari 0.5s ease-out forwards",
-      },
-    },
+        "fade-up": "fade-up 0.5s cubic-bezier(0.16,1,0.3,1) both",
+        "scale-in": "scale-in 0.3s cubic-bezier(0.16,1,0.3,1) both"
+      }
+    }
   },
-  plugins: [],
+  plugins: []
 };
 
 export default config;

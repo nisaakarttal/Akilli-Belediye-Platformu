@@ -6,7 +6,7 @@ import { Building, CheckCircle2, Globe, MapPin, RefreshCw } from "lucide-react";
 import { IlceYonetimKarti } from "@/components/admin/ilce-yonetim-karti";
 import { IstatistikKarti } from "@/components/admin/istatistik-karti";
 import { MahalleYonetimKarti } from "@/components/admin/mahalle-yonetim-karti";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Uyari } from "@/components/ui/uyari";
 import { useAdminKonum } from "@/hooks/use-admin-konum";
 
@@ -52,10 +52,10 @@ export default function YoneticiKonumSayfasi() {
           </p>
         </div>
 
-        <Dugme varyant="anahat" boyut="kucuk" onClick={verileriYenile} className="gap-2 self-start sm:self-auto">
+        <Button varyant="anahat" boyut="kucuk" onClick={verileriYenile} className="gap-2 self-start sm:self-auto">
           <RefreshCw size={14} aria-hidden="true" />
           <span>Verileri Yenile</span>
-        </Dugme>
+        </Button>
       </div>
 
       {/* Bildirim alanı */}

@@ -9,7 +9,7 @@ import { useForm } from "react-hook-form";
 import { Altbilgi } from "@/components/layout/altbilgi";
 import { Basli } from "@/components/layout/basli";
 import { KorumaliRota } from "@/components/layout/korumali-rota";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { FormAlani } from "@/components/ui/form-alani";
 import { Girdi } from "@/components/ui/input";
@@ -144,7 +144,7 @@ function ProfilIcerik() {
                     </Etiket>
                   </div>
                   <div className="relative">
-                    <Girdi
+                    <Input
                       value={kullanici.e_posta}
                       disabled
                       className="bg-kenarlik/30 text-metin-ikincil cursor-not-allowed font-medium"
@@ -156,7 +156,7 @@ function ProfilIcerik() {
                 <form onSubmit={handleSubmit(gonder)} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormAlani id="ad" etiket="Ad" hata={errors.ad?.message}>
-                      <Girdi
+                      <Input
                         id="ad"
                         aria-invalid={!!errors.ad}
                         className="transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20"
@@ -164,7 +164,7 @@ function ProfilIcerik() {
                       />
                     </FormAlani>
                     <FormAlani id="soyad" etiket="Soyad" hata={errors.soyad?.message}>
-                      <Girdi
+                      <Input
                         id="soyad"
                         aria-invalid={!!errors.soyad}
                         className="transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20"
@@ -174,7 +174,7 @@ function ProfilIcerik() {
                   </div>
 
                   <FormAlani id="telefon" etiket="Telefon Numarası" hata={errors.telefon?.message}>
-                    <Girdi
+                    <Input
                       id="telefon"
                       aria-invalid={!!errors.telefon}
                       placeholder="05XX XXX XX XX"
@@ -184,7 +184,7 @@ function ProfilIcerik() {
                   </FormAlani>
 
                   <FormAlani id="adres" etiket="İkametgah Adresi" hata={errors.adres?.message}>
-                    <Girdi
+                    <Input
                       id="adres"
                       placeholder="Mahalle, Cadde, No, Kapaklı/Tekirdağ"
                       className="transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20"
@@ -193,7 +193,7 @@ function ProfilIcerik() {
                   </FormAlani>
 
                   <div className="pt-2">
-                    <Dugme
+                    <Button
                       type="submit"
                       varyant="birincil"
                       boyut="normal"
@@ -211,7 +211,7 @@ function ProfilIcerik() {
                           <span>Değişiklikleri Kaydet</span>
                         </>
                       )}
-                    </Dugme>
+                    </Button>
                   </div>
                 </form>
               </KartIcerik>

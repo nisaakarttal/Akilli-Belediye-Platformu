@@ -1,31 +1,38 @@
-import { api } from "@/lib/api";
-import type { Kullanici, TokenYaniti } from "@/types";
+import { apiClient, tokenleriKaydet, tokenleriTemizle } from "./client";
+import type {
+  Kullanici,
+  KullaniciGirisIstegi,
+  KullaniciKayitIstegi,
+  TokenYaniti,
+} from "@/types";
 
-export interface KayitIstegi {
-  ad: string;
-  soyad: string;
-  e_posta: string;
-  telefon: string;
-  sifre: string;
-  tc_kimlik_no?: string;
-  adres?: string;
+export async function girisYap(istek: KullaniciGirisIstegi): Promise<TokenYaniti> {
+  const { data } = await apiClient.post<TokenYaniti>("/auth/giris", istek);
+  tokenleriKaydet(data);
+  return data;
 }
 
-export interface GirisIstegi {
-  e_posta: string;
-  sifre: string;
+export async function kayitOl(istek: KullaniciKayitIstegi): Promise<Kullanici> {
+  const { data } = await apiClient.post<Kullanici>("/auth/kayit", istek);
+  return data;
 }
 
-export const authApi = {
-  kayitOl: (istek: KayitIstegi) => api.post<TokenYaniti>("/auth/kayit", istek).then((r) => r.data),
+export async function benKimim(): Promise<Kullanici> {
+  const { data } = await apiClient.get<Kullanici>("/auth/ben");
+  return data;
+}
 
-  girisYap: (istek: GirisIstegi) => api.post<TokenYaniti>("/auth/giris", istek).then((r) => r.data),
+export async function sifremiUnuttum(e_posta: string): Promise<void> {
+  await apiClient.post("/auth/sifremi-unuttum", { e_posta });
+}
 
-  benimBilgilerim: () => api.get<Kullanici>("/auth/ben").then((r) => r.data),
+export async function sifreSifirla(token: string, yeni_sifre: string): Promise<void> {
+  await apiClient.post("/auth/sifre-sifirla", { token, yeni_sifre });
+}
 
-  sifremiUnuttum: (e_posta: string) =>
-    api.post<{ mesaj: string }>("/auth/sifremi-unuttum", { e_posta }).then((r) => r.data),
-
-  sifreSifirla: (token: string, yeni_sifre: string) =>
-    api.post<{ mesaj: string }>("/auth/sifre-sifirla", { token, yeni_sifre }).then((r) => r.data),
-};
+export function cikisYap() {
+  tokenleriTemizle();
+  if (typeof window !== "undefined") {
+    window.location.href = "/giris";
+  }
+}

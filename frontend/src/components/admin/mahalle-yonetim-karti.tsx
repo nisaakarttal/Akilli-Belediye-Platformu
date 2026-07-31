@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Compass, Loader2, MapPin, Plus, Search, X } from "lucide-react";
 import type { Dispatch, FormEvent, SetStateAction } from "react";
 
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { Girdi } from "@/components/ui/input";
 import { Etiket } from "@/components/ui/label";
@@ -66,7 +66,7 @@ export function MahalleYonetimKarti({
               <Etiket htmlFor="mahalle-ad" className="text-xs font-bold text-metin">
                 Mahalle Adı <span className="text-tehlike">*</span>
               </Etiket>
-              <Girdi
+              <Input
                 id="mahalle-ad"
                 placeholder="Örn: Cumhuriyet Mah."
                 value={form.ad}
@@ -102,14 +102,14 @@ export function MahalleYonetimKarti({
               <Compass size={12} className="text-ikincil-500" aria-hidden="true" /> GPS Merkez Koordinatları
             </Etiket>
             <div className="grid grid-cols-2 gap-2">
-              <Girdi
+              <Input
                 placeholder="Enlem (Lat)"
                 value={form.merkez_enlem}
                 onChange={(e) => onFormDegistir({ ...form, merkez_enlem: e.target.value })}
                 className="text-xs font-mono"
                 aria-label="Mahalle merkez enlem"
               />
-              <Girdi
+              <Input
                 placeholder="Boylam (Lng)"
                 value={form.merkez_boylam}
                 onChange={(e) => onFormDegistir({ ...form, merkez_boylam: e.target.value })}
@@ -119,14 +119,14 @@ export function MahalleYonetimKarti({
             </div>
           </div>
 
-          <Dugme type="submit" varyant="birincil" boyut="kucuk" disabled={kaydediliyorMu} className="w-full gap-1.5">
+          <Button type="submit" varyant="birincil" boyut="kucuk" disabled={kaydediliyorMu} className="w-full gap-1.5">
             {kaydediliyorMu ? (
               <Loader2 size={15} className="animate-spin" aria-hidden="true" />
             ) : (
               <Plus size={15} aria-hidden="true" />
             )}
             <span>Mahalle Kaydet</span>
-          </Dugme>
+          </Button>
         </form>
 
         <div className="space-y-2.5">
@@ -171,7 +171,7 @@ export function MahalleYonetimKarti({
 
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-ikincil-500" aria-hidden="true" />
-            <Girdi
+            <Input
               value={arama}
               onChange={(e) => onAramaDegistir(e.target.value)}
               placeholder="Mahalle adı yazarak süzün..."

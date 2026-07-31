@@ -20,7 +20,7 @@ import { IstatistikKarti } from "@/components/admin/istatistik-karti";
 import { KategoriFormu } from "@/components/admin/kategori-formu";
 import { KategoriKarti } from "@/components/admin/kategori-karti";
 import { KategoriTablosu } from "@/components/admin/kategori-tablosu";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Girdi } from "@/components/ui/input";
 import { Uyari } from "@/components/ui/uyari";
 import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
@@ -195,7 +195,7 @@ export default function YoneticiKategorilerSayfasi() {
 
 
 
-          <Dugme
+          <Button
             varyant="anahat"
             disabled={isRefetching}
             onClick={() => refetch()}
@@ -211,7 +211,7 @@ export default function YoneticiKategorilerSayfasi() {
 
             Yenile
 
-          </Dugme>
+          </Button>
 
 
         </div>
@@ -345,7 +345,7 @@ export default function YoneticiKategorilerSayfasi() {
           />
 
 
-          <Girdi
+          <Input
             value={aramaMetni}
             onChange={(e)=>setAramaMetni(e.target.value)}
             placeholder="Kategori veya müdürlük ara..."

@@ -1,70 +1,51 @@
-import { Slot } from "@radix-ui/react-slot";
+import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
-import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
-
 import { cn } from "@/lib/utils";
 
-const YUKLENIYOR_SIMGE_BOYUTU = 16;
-
-const dugmeVaryantlari = cva(
-  "relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-birincil-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]",
   {
     variants: {
-      varyant: {
-        birincil: "bg-birincil-600 text-white shadow-lg shadow-birincil-600/25 hover:bg-birincil-700",
-        ikincil: "bg-ikincil-500 text-white shadow-lg shadow-ikincil-500/25 hover:bg-sky-600",
-        hayalet: "bg-transparent text-metin hover:bg-black/5 dark:hover:bg-white/10",
-        anahat: "border border-kenarlik bg-transparent hover:bg-black/5 dark:hover:bg-white/10",
-        tehlike: "bg-tehlike text-white shadow-lg shadow-tehlike/25 hover:bg-red-600",
-        cam: "cam-kart text-metin hover:bg-white/80 dark:hover:bg-white/10",
+      variant: {
+        primary: "bg-primary text-primary-foreground shadow-sm hover:bg-primary-800",
+        secondary: "bg-surface text-foreground border border-border shadow-sm hover:bg-muted",
+        ghost: "text-foreground hover:bg-muted",
+        danger: "bg-danger text-white shadow-sm hover:opacity-90",
+        link: "text-primary underline-offset-4 hover:underline p-0 h-auto",
       },
-      boyut: {
-        kucuk: "h-9 px-3 text-xs",
-        orta: "h-11 px-5",
-        buyuk: "h-14 px-8 text-base",
-        simge: "h-10 w-10",
+      size: {
+        sm: "h-9 px-3.5 text-[13px]",
+        md: "h-11 px-5",
+        lg: "h-12 px-6 text-[15px]",
+        icon: "h-10 w-10",
       },
     },
-    defaultVariants: {
-      varyant: "birincil",
-      boyut: "orta",
-    },
+    defaultVariants: { variant: "primary", size: "md" },
   }
 );
 
-export interface DugmeProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof dugmeVaryantlari> {
-  /** `true` olduğunda `asChild` ile bir alt bileşene (ör. Link) devretme davranışı sağlar. */
-  asChild?: boolean;
-  /** Dış eylem (API çağrısı vb.) sürerken dönme animasyonu gösterir ve tekrar tıklamayı engeller. */
-  yukleniyorMu?: boolean;
-  /** Yükleme sırasında gösterilecek metin; verilmezse mevcut içerik korunur. */
-  yukleniyorMetni?: ReactNode;
+export { buttonVariants };
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  loading?: boolean;
 }
 
-const Dugme = forwardRef<HTMLButtonElement, DugmeProps>(
-  (
-    { className, varyant, boyut, asChild = false, yukleniyorMu = false, yukleniyorMetni, disabled, children, ...props },
-    ref
-  ) => {
-    const Bilesen = asChild ? Slot : "button";
-
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, loading, disabled, children, ...props }, ref) => {
     return (
-      <Bilesen
-        className={cn(dugmeVaryantlari({ varyant, boyut, className }))}
+      <button
         ref={ref}
-        disabled={disabled || yukleniyorMu}
-        aria-busy={yukleniyorMu || undefined}
+        className={cn(buttonVariants({ variant, size }), className)}
+        disabled={disabled || loading}
         {...props}
       >
-        {yukleniyorMu && <Loader2 className="animate-spin" size={YUKLENIYOR_SIMGE_BOYUTU} aria-hidden="true" />}
-        {yukleniyorMu ? yukleniyorMetni ?? children : children}
-      </Bilesen>
+        {loading && <Loader2 className="h-4 w-4 animate-spin" aria-hidden />}
+        {children}
+      </button>
     );
   }
 );
-Dugme.displayName = "Dugme";
-
-export { Dugme, dugmeVaryantlari };
+Button.displayName = "Button";

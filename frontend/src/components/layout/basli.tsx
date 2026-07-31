@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { TemaDegistirici } from "@/components/layout/tema-degistirici";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useKimlik } from "@/hooks/use-kimlik";
 import { bildirimlerApi } from "@/lib/api/bildirimler";
 import { cn } from "@/lib/utils";
@@ -109,23 +109,23 @@ export function Basli() {
             <>
               {kullanici.rol === "personel" && (
                 <Link href="/personel">
-                  <Dugme varyant="hayalet" boyut="simge" aria-label="Personel Paneli">
+                  <Button varyant="hayalet" boyut="simge" aria-label="Personel Paneli">
                     <ClipboardList size={BASLIK_IKON_BOYUTU} />
-                  </Dugme>
+                  </Button>
                 </Link>
               )}
               {kullanici.rol === "admin" && (
                 <Link href="/admin">
-                  <Dugme varyant="hayalet" boyut="simge" aria-label="Yönetici Paneli">
+                  <Button varyant="hayalet" boyut="simge" aria-label="Yönetici Paneli">
                     <LayoutDashboard size={BASLIK_IKON_BOYUTU} />
-                  </Dugme>
+                  </Button>
                 </Link>
               )}
 
               <Link href="/bildirimler" className="relative inline-flex items-center justify-center">
-                <Dugme varyant="hayalet" boyut="simge" aria-label="Bildirimler">
+                <Button varyant="hayalet" boyut="simge" aria-label="Bildirimler">
                   <Bell size={BASLIK_IKON_BOYUTU} />
-                </Dugme>
+                </Button>
                 {okunmamisVarMi && (
                   <span className="pointer-events-none absolute right-1.5 top-1.5 flex h-2.5 w-2.5" aria-hidden="true">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
@@ -135,29 +135,29 @@ export function Basli() {
               </Link>
 
               <Link href="/profil" className="hidden items-center gap-2 sm:flex">
-                <Dugme varyant="hayalet" boyut="orta" className="gap-2">
+                <Button varyant="hayalet" boyut="orta" className="gap-2">
                   <User size={16} />
                   {kullanici.ad}
-                </Dugme>
+                </Button>
               </Link>
-              <Dugme varyant="hayalet" boyut="simge" onClick={cikisYap} aria-label="Çıkış Yap">
+              <Button varyant="hayalet" boyut="simge" onClick={cikisYap} aria-label="Çıkış Yap">
                 <LogOut size={BASLIK_IKON_BOYUTU} />
-              </Dugme>
+              </Button>
             </>
           )}
 
           {!yukleniyor && !kullanici && (
             <div className="hidden items-center gap-2 sm:flex">
               <Link href="/giris">
-                <Dugme varyant="hayalet">Giriş Yap</Dugme>
+                <Button varyant="hayalet">Giriş Yap</Button>
               </Link>
               <Link href="/kayit">
-                <Dugme varyant="birincil">Kayıt Ol</Dugme>
+                <Button varyant="birincil">Kayıt Ol</Button>
               </Link>
             </div>
           )}
 
-          <Dugme
+          <Button
             varyant="hayalet"
             boyut="simge"
             className="lg:hidden"
@@ -166,7 +166,7 @@ export function Basli() {
             aria-expanded={menuAcikMi}
           >
             {menuAcikMi ? <X size={MOBIL_MENU_IKON_BOYUTU} /> : <Menu size={MOBIL_MENU_IKON_BOYUTU} />}
-          </Dugme>
+          </Button>
         </div>
       </div>
 
@@ -185,10 +185,10 @@ export function Basli() {
           {!kullanici && (
             <div className="mt-2 flex gap-2">
               <Link href="/giris" className="flex-1">
-                <Dugme varyant="anahat" className="w-full">Giriş Yap</Dugme>
+                <Button varyant="anahat" className="w-full">Giriş Yap</Button>
               </Link>
               <Link href="/kayit" className="flex-1">
-                <Dugme varyant="birincil" className="w-full">Kayıt Ol</Dugme>
+                <Button varyant="birincil" className="w-full">Kayıt Ol</Button>
               </Link>
             </div>
           )}

@@ -25,7 +25,7 @@ import { DosyaListesi } from "@/components/sikayet/dosya-listesi";
 import { DurumRozeti } from "@/components/sikayet/durum-rozeti";
 import { OncelikRozeti } from "@/components/sikayet/oncelik-rozeti";
 import { ZamanTuneli } from "@/components/sikayet/zaman-tuneli";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { Secim } from "@/components/ui/select";
 import { Uyari } from "@/components/ui/uyari";
@@ -182,7 +182,7 @@ function AdminTalepDetayIcerik() {
                     </Secim>
                   </div>
 
-                  <Dugme
+                  <Button
                     varyant="birincil"
                     disabled={!secilenPersonelId || atamaMutation.isPending}
                     onClick={() => atamaMutation.mutate(secilenPersonelId)}
@@ -199,7 +199,7 @@ function AdminTalepDetayIcerik() {
                         <span>{atananPersonel ? "Atamayı Güncelle" : "Görevi Ata"}</span>
                       </>
                     )}
-                  </Dugme>
+                  </Button>
                 </div>
               </div>
             </YoneticiBolumKarti>

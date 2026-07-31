@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Building, Loader2, Navigation, Plus } from "lucide-react";
 import type { Dispatch, FormEvent, SetStateAction } from "react";
 
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { Girdi } from "@/components/ui/input";
 import { Etiket } from "@/components/ui/label";
@@ -52,7 +52,7 @@ export function IlceYonetimKarti({ ilceler, ilcelerYukleniyor, form, onFormDegis
               <Etiket htmlFor="ilce-ad" className="text-xs font-bold text-metin">
                 İlçe Adı <span className="text-tehlike">*</span>
               </Etiket>
-              <Girdi
+              <Input
                 id="ilce-ad"
                 placeholder="Örn: Kapaklı"
                 value={form.ad}
@@ -65,7 +65,7 @@ export function IlceYonetimKarti({ ilceler, ilcelerYukleniyor, form, onFormDegis
               <Etiket htmlFor="ilce-il" className="text-xs font-bold text-metin">
                 Bağlı İl <span className="text-tehlike">*</span>
               </Etiket>
-              <Girdi
+              <Input
                 id="ilce-il"
                 value={form.il}
                 onChange={(e) => onFormDegistir({ ...form, il: e.target.value })}
@@ -81,14 +81,14 @@ export function IlceYonetimKarti({ ilceler, ilcelerYukleniyor, form, onFormDegis
               <span>GPS Merkez Koordinatları</span>
             </Etiket>
             <div className="grid grid-cols-2 gap-2.5">
-              <Girdi
+              <Input
                 placeholder="Enlem (Lat)"
                 value={form.merkez_enlem}
                 onChange={(e) => onFormDegistir({ ...form, merkez_enlem: e.target.value })}
                 className="text-xs font-mono transition-all duration-200 focus:ring-2 focus:ring-birincil-500/20 bg-zemin"
                 aria-label="İlçe merkez enlem"
               />
-              <Girdi
+              <Input
                 placeholder="Boylam (Lng)"
                 value={form.merkez_boylam}
                 onChange={(e) => onFormDegistir({ ...form, merkez_boylam: e.target.value })}
@@ -98,7 +98,7 @@ export function IlceYonetimKarti({ ilceler, ilcelerYukleniyor, form, onFormDegis
             </div>
           </div>
 
-          <Dugme
+          <Button
             type="submit"
             varyant="birincil"
             boyut="normal"
@@ -111,7 +111,7 @@ export function IlceYonetimKarti({ ilceler, ilcelerYukleniyor, form, onFormDegis
               <Plus size={16} aria-hidden="true" />
             )}
             <span>İlçe Kaydet</span>
-          </Dugme>
+          </Button>
         </form>
 
         <div className="flex-1 space-y-3">

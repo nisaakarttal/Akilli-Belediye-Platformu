@@ -1,68 +1,80 @@
-import { api } from "@/lib/api";
+import { apiClient } from "./client";
 import type {
-  DosyaTuru,
   SayfalanmisYanit,
+  DosyaTuru,
+  Memnuniyet,
   TalepDetay,
-  TalepDosyasi,
   TalepDurumu,
+  TalepFiltreleri,
   TalepHaritaNoktasi,
   TalepListe,
-  TalepOnceligi,
+  TalepOlusturIstegi,
 } from "@/types";
 
-export interface TalepOlusturIstegi {
-  baslik: string;
-  aciklama: string;
-  kategori_id: string;
-  mahalle_id: string;
-  adres_detay?: string;
-  enlem: number;
-  boylam: number;
-  oncelik: TalepOnceligi;
-  ai_onerilen_kategori_id?: string | null;
-  ai_onerilen_oncelik?: TalepOnceligi | null;
-  ai_guven_skoru?: number | null;
+/** Vatandaşsa yalnızca kendi talepleri, personel/admin ise tümü döner (backend rolüne göre filtreler). */
+export async function taleplerListele(filtreler: TalepFiltreleri = {}): Promise<SayfalanmisYanit<TalepListe>> {
+  const { data } = await apiClient.get<SayfalanmisYanit<TalepListe>>("/talepler", { params: filtreler });
+  return data;
 }
 
-export interface TalepListeFiltreleri {
-  durum?: TalepDurumu;
-  kategori_id?: string;
-  mahalle_id?: string;
-  oncelik?: TalepOnceligi;
-  sayfa?: number;
-  sayfa_boyutu?: number;
+export async function talepOlustur(istek: TalepOlusturIstegi): Promise<TalepDetay> {
+  const { data } = await apiClient.post<TalepDetay>("/talepler", istek);
+  return data;
 }
 
-export const taleplerApi = {
-  olustur: (istek: TalepOlusturIstegi) => api.post<TalepDetay>("/talepler/", istek).then((r) => r.data),
+export async function talepDetayGetir(id: string): Promise<TalepDetay> {
+  const { data } = await apiClient.get<TalepDetay>(`/talepler/${id}`);
+  return data;
+}
 
-  listele: (filtreler: TalepListeFiltreleri = {}) =>
-    api.get<SayfalanmisYanit<TalepListe>>("/talepler/", { params: filtreler }).then((r) => r.data),
+export async function takipNoIleSorgula(takipNo: string): Promise<TalepDetay> {
+  const { data } = await apiClient.get<TalepDetay>(`/talepler/takip/${takipNo}`);
+  return data;
+}
 
-  getir: (id: string) => api.get<TalepDetay>(`/talepler/${id}`).then((r) => r.data),
+export async function talepDosyaYukle(id: string, dosya: File, dosyaTuru: DosyaTuru = "fotograf"): Promise<void> {
+  const form = new FormData();
+  form.append("dosya", dosya);
+  await apiClient.post(`/talepler/${id}/dosya`, form, {
+    params: { dosya_turu: dosyaTuru },
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+}
 
-  takipNoIleGetir: (takipNo: string) => api.get<TalepDetay>(`/talepler/takip/${takipNo}`).then((r) => r.data),
+export async function memnuniyetBildir(id: string, puan: number, yorum?: string): Promise<Memnuniyet> {
+  const { data } = await apiClient.post<Memnuniyet>(`/talepler/${id}/memnuniyet`, { puan, yorum });
+  return data;
+}
 
-  haritaNoktalari: (filtreler: { durum?: TalepDurumu; kategori_id?: string } = {}) =>
-    api.get<TalepHaritaNoktasi[]>("/talepler/harita", { params: filtreler }).then((r) => r.data),
+export async function memnuniyetGetir(id: string): Promise<Memnuniyet> {
+  const { data } = await apiClient.get<Memnuniyet>(`/talepler/${id}/memnuniyet`);
+  return data;
+}
 
-  dosyaYukle: (talepId: string, dosya: File, dosyaTuru: DosyaTuru) => {
-    const form = new FormData();
-    form.append("dosya", dosya);
-    return api
-      .post<TalepDosyasi>(`/talepler/${talepId}/dosya`, form, {
-        params: { dosya_turu: dosyaTuru },
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      .then((r) => r.data);
-  },
+export async function gecikenTalepleriListele(): Promise<TalepListe[]> {
+  const { data } = await apiClient.get<TalepListe[]>("/talepler/gecikenler");
+  return data;
+}
 
-  durumGuncelle: (talepId: string, durum: TalepDurumu, aciklama?: string) =>
-    api.put<TalepDetay>(`/talepler/${talepId}/durum`, { durum, aciklama }).then((r) => r.data),
+export async function talepDurumGuncelle(id: string, durum: TalepDurumu, aciklama?: string): Promise<TalepDetay> {
+  const { data } = await apiClient.put<TalepDetay>(`/talepler/${id}/durum`, { durum, aciklama });
+  return data;
+}
 
-  ata: (talepId: string, personelId: string, not_?: string) =>
-    api.post<TalepDetay>(`/talepler/${talepId}/ata`, { personel_id: personelId, not: not_ }).then((r) => r.data),
+export async function talepAta(id: string, personelId: string, not_?: string): Promise<TalepDetay> {
+  const { data } = await apiClient.post<TalepDetay>(`/talepler/${id}/ata`, {
+    personel_id: personelId,
+    not: not_,
+  });
+  return data;
+}
 
-  coz: (talepId: string, cozumNotu: string) =>
-    api.post<TalepDetay>(`/talepler/${talepId}/coz`, { cozum_notu: cozumNotu }).then((r) => r.data),
-};
+export async function talepCoz(id: string, cozumNotu: string): Promise<TalepDetay> {
+  const { data } = await apiClient.post<TalepDetay>(`/talepler/${id}/coz`, { cozum_notu: cozumNotu });
+  return data;
+}
+
+export async function taleplerHaritaVerisi(): Promise<TalepHaritaNoktasi[]> {
+  const { data } = await apiClient.get<TalepHaritaNoktasi[]>("/talepler/harita");
+  return data;
+}

@@ -13,7 +13,7 @@ import { DurumRozeti } from "@/components/sikayet/durum-rozeti";
 import { OncelikRozeti } from "@/components/sikayet/oncelik-rozeti";
 import { ZamanTuneli } from "@/components/sikayet/zaman-tuneli";
 import { FadeInStagger, StaggerOgesi } from "@/components/ui/animasyon";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { Etiket } from "@/components/ui/label";
 import { Secim } from "@/components/ui/select";
@@ -195,10 +195,10 @@ export default function PersonelTalepDetaySayfasi() {
                         placeholder="Vatandaşa iletilecek kısa bir not..."
                       />
                     </div>
-                    <Dugme type="submit" varyant="birincil" disabled={durumGuncelleniyor} className="gap-2">
+                    <Button type="submit" varyant="birincil" disabled={durumGuncelleniyor} className="gap-2">
                       {durumGuncelleniyor && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
                       {durumGuncelleniyor ? "Güncelleniyor..." : "Durumu Güncelle"}
-                    </Dugme>
+                    </Button>
                   </form>
                 </KartIcerik>
               </Kart>
@@ -226,7 +226,7 @@ export default function PersonelTalepDetaySayfasi() {
                       <Etiket>Sonuç Fotoğrafı</Etiket>
                       <DosyaSecici dosyalar={sonucDosyalari} onDegistir={setSonucDosyalari} />
                     </div>
-                    <Dugme
+                    <Button
                       type="submit"
                       varyant="birincil"
                       disabled={cozuluyor || cozumNotu.length < COZUM_NOTU_MIN_UZUNLUK}
@@ -234,7 +234,7 @@ export default function PersonelTalepDetaySayfasi() {
                     >
                       {cozuluyor && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
                       {cozuluyor ? "Kaydediliyor..." : "Talebi Çözüldü Olarak İşaretle"}
-                    </Dugme>
+                    </Button>
                   </form>
                 </KartIcerik>
               </Kart>

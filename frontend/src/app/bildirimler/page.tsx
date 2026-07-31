@@ -7,7 +7,7 @@ import { Altbilgi } from "@/components/layout/altbilgi";
 import { Basli } from "@/components/layout/basli";
 import { KorumaliRota } from "@/components/layout/korumali-rota";
 import { BildirimSatiri } from "@/components/bildirimler/bildirim-satiri";
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartIcerik } from "@/components/ui/card";
 import { useBildirimler, type BildirimFiltresi } from "@/hooks/use-bildirimler";
 import { cn } from "@/lib/utils";
@@ -61,7 +61,7 @@ function BildirimlerIcerik() {
             </div>
 
             {data && okunmamisSayisi > 0 && (
-              <Dugme
+              <Button
                 varyant="anahat"
                 boyut="kucuk"
                 onClick={hepsiniOkunduYap}
@@ -70,7 +70,7 @@ function BildirimlerIcerik() {
               >
                 <CheckCheck size={15} className="text-birincil-500" aria-hidden="true" />
                 Tümünü Okundu Yap
-              </Dugme>
+              </Button>
             )}
           </div>
 

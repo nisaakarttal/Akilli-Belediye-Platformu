@@ -1,197 +1,139 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
-import { RefreshCw, Search, ShieldAlert, Users, UserCheck, UserX, X } from "lucide-react";
-
-import { IstatistikKarti } from "@/components/admin/istatistik-karti";
-import { KullaniciSatiri } from "@/components/admin/kullanici-satiri";
-import { KorumaliRota } from "@/components/layout/korumali-rota";
-import { Dugme } from "@/components/ui/button";
-import { Kart, KartIcerik } from "@/components/ui/card";
-import { Girdi } from "@/components/ui/input";
-import { Secim } from "@/components/ui/select";
-import { Uyari } from "@/components/ui/uyari";
-import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
-import { ROL_ETIKETI } from "@/constants/kullanici";
-import { useAdminKullanicilar } from "@/hooks/use-admin-kullanicilar";
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
+import { kullanicilariListele, kullaniciRoluGuncelle, kullaniciDurumuGuncelle } from "@/lib/api/kullanicilar";
+import { apiHataMesaji } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
 import type { KullaniciRolu } from "@/types";
 
-function YoneticiKullanicilarIcerik() {
-  const {
-    arama,
-    setArama,
-    rolFiltresi,
-    setRolFiltresi,
-    hata,
-    basari,
-    isLoading,
-    isRefetching,
-    refetch,
-    kullanicilar,
-    istatistikler,
-    rolGuncelleMutation,
-    durumDegistirMutation,
-  } = useAdminKullanicilar();
+const SAYFA_BOYUTU = 15;
+
+const ROL_SEKMELERI: { deger: KullaniciRolu | "tumu"; etiket: string }[] = [
+  { deger: "tumu", etiket: "Tümü" },
+  { deger: "vatandas", etiket: "Vatandaş" },
+  { deger: "personel", etiket: "Personel" },
+  { deger: "admin", etiket: "Admin" },
+];
+
+export default function KullaniciYonetimiSayfasi() {
+  const [rol, setRol] = useState<KullaniciRolu | "tumu">("tumu");
+  const [sayfa, setSayfa] = useState(1);
+  const queryClient = useQueryClient();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin", "kullanicilar", rol, sayfa],
+    queryFn: () => kullanicilariListele({ rol: rol === "tumu" ? undefined : rol, sayfa, sayfa_boyutu: SAYFA_BOYUTU }),
+  });
+
+  function yenile() {
+    queryClient.invalidateQueries({ queryKey: ["admin", "kullanicilar"] });
+  }
+
+  const roluGuncelle = useMutation({
+    mutationFn: ({ id, rol }: { id: string; rol: KullaniciRolu }) => kullaniciRoluGuncelle(id, rol),
+    onSuccess: () => { toast.success("Rol güncellendi."); yenile(); },
+    onError: (h) => toast.error(apiHataMesaji(h)),
+  });
+
+  const durumuGuncelle = useMutation({
+    mutationFn: ({ id, aktifMi }: { id: string; aktifMi: boolean }) => kullaniciDurumuGuncelle(id, aktifMi),
+    onSuccess: () => { toast.success("Kullanıcı durumu güncellendi."); yenile(); },
+    onError: (h) => toast.error(apiHataMesaji(h)),
+  });
+
+  const kayitlar = data?.veriler ?? [];
+  const toplamSayfa = data ? Math.max(1, Math.ceil(data.toplam / SAYFA_BOYUTU)) : 1;
 
   return (
-    <div className="space-y-8">
-      {/* İstatistik özeti */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <IstatistikKarti
-          ikon={Users}
-          etiket="Toplam Kullanıcı"
-          deger={istatistikler.toplam}
-          vurgu="birincil"
-          aciklama="Kayıtlı kullanıcı portföyü"
-        />
-        <IstatistikKarti
-          ikon={UserCheck}
-          etiket="Aktif Hesaplar"
-          deger={istatistikler.aktifler}
-          vurgu="basarili"
-          aciklama="Erişim yetkisi açık"
-        />
-        <IstatistikKarti
-          ikon={UserX}
-          etiket="Pasif / Kısıtlı"
-          deger={istatistikler.pasifler}
-          vurgu="tehlike"
-          aciklama="Dondurulmuş hesaplar"
-        />
-        <IstatistikKarti
-          ikon={ShieldAlert}
-          etiket="Sistem Yöneticileri"
-          deger={istatistikler.adminler}
-          vurgu="uyari"
-          aciklama="Tam yetkili kullanıcılar"
-        />
-      </div>
+    <div>
+      <h1 className="font-display text-xl font-bold text-foreground">Kullanıcı Yönetimi</h1>
 
-      {/* Başlık ve yenile eylemi */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-black tracking-tight text-metin sm:text-3xl">Kullanıcı Yönetimi</h1>
-          <p className="mt-1 text-sm text-metin-ikincil">
-            Tüm kullanıcı hesaplarını görüntüleyin, yetkilendirmeleri yapın ve erişim durumlarını yönetin.
-          </p>
-        </div>
-
-        <Dugme
-          varyant="anahat"
-          boyut="kucuk"
-          onClick={() => refetch()}
-          disabled={isRefetching}
-          className="gap-2 self-start sm:self-auto"
-        >
-          <RefreshCw size={14} className={cn(isRefetching && "animate-spin")} aria-hidden="true" />
-          <span>Listeyi Yenile</span>
-        </Dugme>
-      </div>
-
-      {/* Bildirim alanı */}
-      <AnimatePresence mode="wait">
-        {hata && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-            <Uyari tur="hata">{hata}</Uyari>
-          </motion.div>
-        )}
-        {basari && (
-          <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-            <Uyari tur="basari">{basari}</Uyari>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Arama ve rol filtreleme çubuğu */}
-      <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-kenarlik bg-birincil-600/5 p-4 shadow-sm">
-        <div className="relative min-w-[240px] flex-1">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-birincil-500" aria-hidden="true" />
-          <Girdi
-            placeholder="Ad, soyad veya e-posta ile ara..."
-            className="pl-9 pr-9 text-sm"
-            value={arama}
-            onChange={(e) => setArama(e.target.value)}
-            aria-label="Kullanıcılarda ara"
-          />
-          {arama && (
-            <button
-              onClick={() => setArama("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-metin-ikincil hover:text-metin"
-              aria-label="Aramayı temizle"
-            >
-              <X size={14} aria-hidden="true" />
-            </button>
-          )}
-        </div>
-
-        <div className="min-w-[180px]">
-          <Secim
-            value={rolFiltresi}
-            onChange={(e) => setRolFiltresi(e.target.value as KullaniciRolu | "")}
-            className="text-sm font-medium"
-            aria-label="Rol filtresi"
+      <div className="mt-4 flex gap-2">
+        {ROL_SEKMELERI.map((sekme) => (
+          <button
+            key={sekme.deger}
+            onClick={() => { setRol(sekme.deger); setSayfa(1); }}
+            className={cn(
+              "rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors",
+              rol === sekme.deger ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-primary-50"
+            )}
           >
-            <option value="">Tüm Roller</option>
-            {Object.entries(ROL_ETIKETI).map(([deger, etiket]) => (
-              <option key={deger} value={deger}>
-                {etiket}
-              </option>
-            ))}
-          </Secim>
-        </div>
+            {sekme.etiket}
+          </button>
+        ))}
       </div>
 
-      {/* Liste görünümü */}
-      {isLoading ? (
-        <TamSayfaYukleniyor />
-      ) : (
-        <div className="space-y-3">
-          <AnimatePresence>
-            {kullanicilar.map((kullanici) => (
-              <motion.div
-                key={kullanici.id}
-                layout
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-              >
-                <KullaniciSatiri
-                  kullanici={kullanici}
-                  rolGuncelleniyorMu={rolGuncelleMutation.isPending && rolGuncelleMutation.variables?.id === kullanici.id}
-                  durumGuncelleniyorMu={
-                    durumDegistirMutation.isPending && durumDegistirMutation.variables?.id === kullanici.id
-                  }
-                  onRolDegistir={(rol) => rolGuncelleMutation.mutate({ id: kullanici.id, rol })}
-                  onDurumDegistir={() =>
-                    durumDegistirMutation.mutate({ id: kullanici.id, aktifMi: !kullanici.aktif_mi })
-                  }
-                />
-              </motion.div>
-            ))}
-          </AnimatePresence>
+      <Card className="mt-4 overflow-hidden">
+        {isLoading ? (
+          <div className="space-y-3 p-5">
+            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-muted" />)}
+          </div>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                <th className="p-3 font-medium">Kullanıcı</th>
+                <th className="p-3 font-medium">Telefon</th>
+                <th className="p-3 font-medium">Rol</th>
+                <th className="p-3 font-medium">Durum</th>
+              </tr>
+            </thead>
+            <tbody>
+              {kayitlar.map((k) => (
+                <tr key={k.id} className="border-b border-border last:border-0">
+                  <td className="p-3">
+                    <div className="flex items-center gap-2.5">
+                      <Avatar ad={k.ad} soyad={k.soyad} src={k.profil_fotografi} className="h-8 w-8 text-xs" />
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-foreground">{k.ad} {k.soyad}</p>
+                        <p className="truncate text-xs text-muted-foreground">{k.e_posta}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-3 text-muted-foreground">{k.telefon}</td>
+                  <td className="p-3">
+                    <select
+                      value={k.rol}
+                      onChange={(e) => roluGuncelle.mutate({ id: k.id, rol: e.target.value as KullaniciRolu })}
+                      className="h-9 rounded-lg border border-border bg-surface px-2 text-xs"
+                    >
+                      <option value="vatandas">Vatandaş</option>
+                      <option value="personel">Personel</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
+                  <td className="p-3">
+                    <button
+                      onClick={() => durumuGuncelle.mutate({ id: k.id, aktifMi: !k.aktif_mi })}
+                      className="inline-block"
+                    >
+                      <Badge variant={k.aktif_mi ? "success" : "neutral"}>{k.aktif_mi ? "Aktif" : "Pasif"}</Badge>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Card>
 
-          {kullanicilar.length === 0 && (
-            <Kart className="border border-dashed">
-              <KartIcerik className="py-12 text-center">
-                <Users size={32} className="mx-auto text-birincil-300" aria-hidden="true" />
-                <p className="mt-2 text-sm font-semibold text-metin">Eşleşen kullanıcı bulunamadı.</p>
-                <p className="mt-1 text-xs text-metin-ikincil">
-                  Arama kriterlerinizi değiştirerek tekrar deneyebilirsiniz.
-                </p>
-              </KartIcerik>
-            </Kart>
-          )}
+      {toplamSayfa > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-2">
+          <button onClick={() => setSayfa((s) => Math.max(1, s - 1))} disabled={sayfa === 1} className="flex h-9 w-9 items-center justify-center rounded-lg border border-border disabled:opacity-40" aria-label="Önceki sayfa">
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <span className="text-sm text-muted-foreground">{sayfa} / {toplamSayfa}</span>
+          <button onClick={() => setSayfa((s) => Math.min(toplamSayfa, s + 1))} disabled={sayfa === toplamSayfa} className="flex h-9 w-9 items-center justify-center rounded-lg border border-border disabled:opacity-40" aria-label="Sonraki sayfa">
+            <ChevronRight className="h-4 w-4" />
+          </button>
         </div>
       )}
     </div>
-  );
-}
-
-export default function YoneticiKullanicilarSayfasi() {
-  return (
-    <KorumaliRota izinliRoller={["admin"]}>
-      <YoneticiKullanicilarIcerik />
-    </KorumaliRota>
   );
 }

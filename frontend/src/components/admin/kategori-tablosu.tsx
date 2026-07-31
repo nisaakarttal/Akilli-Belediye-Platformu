@@ -1,6 +1,6 @@
 import { Pencil, Trash2 } from "lucide-react";
 
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import type { Kategori } from "@/types";
 
 interface KategoriTablosuProps {
@@ -38,7 +38,7 @@ export function KategoriTablosu({ kategoriler, onDuzenle, onSil }: KategoriTablo
                 <td className="max-w-xs truncate px-6 py-4 font-medium text-metin-ikincil">{kategori.aciklama || "-"}</td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-1">
-                    <Dugme
+                    <Button
                       varyant="hayalet"
                       boyut="simge"
                       className="h-8 w-8 text-metin-ikincil hover:text-metin"
@@ -46,8 +46,8 @@ export function KategoriTablosu({ kategoriler, onDuzenle, onSil }: KategoriTablo
                       aria-label={`${kategori.ad} kategorisini düzenle`}
                     >
                       <Pencil size={15} aria-hidden="true" />
-                    </Dugme>
-                    <Dugme
+                    </Button>
+                    <Button
                       varyant="hayalet"
                       boyut="simge"
                       className="h-8 w-8 text-metin-ikincil hover:text-tehlike"
@@ -55,7 +55,7 @@ export function KategoriTablosu({ kategoriler, onDuzenle, onSil }: KategoriTablo
                       aria-label={`${kategori.ad} kategorisini sil`}
                     >
                       <Trash2 size={15} aria-hidden="true" />
-                    </Dugme>
+                    </Button>
                   </div>
                 </td>
               </tr>

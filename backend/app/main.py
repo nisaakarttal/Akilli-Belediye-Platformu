@@ -88,6 +88,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
                 "font-src 'self' https:;"
             )
 
+
         return response
 
 

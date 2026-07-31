@@ -1,6 +1,7 @@
-import { api } from "@/lib/api";
+import { apiClient } from "./client";
 import type { TalepListe } from "@/types";
 
-export const personelApi = {
-  atananTalepler: () => api.get<TalepListe[]>("/personel/atanan-talepler").then((r) => r.data),
-};
+export async function atananTalepleriListele(): Promise<TalepListe[]> {
+  const { data } = await apiClient.get<TalepListe[]>("/personel/atanan-talepler");
+  return data;
+}

@@ -1,33 +1,47 @@
-import { forwardRef, type InputHTMLAttributes } from "react";
-
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
-export interface GirdiProps extends InputHTMLAttributes<HTMLInputElement> {
-  /** Doğrulama hatası olduğunda kırmızı kenarlık/halka gösterir ve `aria-invalid` ekler. */
-  hataliMi?: boolean;
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  error?: string;
 }
 
-const Girdi = forwardRef<HTMLInputElement, GirdiProps>(
-  ({ className, type, hataliMi = false, "aria-invalid": ariaInvalid, ...props }, ref) => {
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, error, ...props }, ref) => {
     return (
       <input
-        type={type}
         ref={ref}
-        aria-invalid={hataliMi || ariaInvalid}
         className={cn(
-          "flex h-11 w-full rounded-xl border bg-white/70 px-4 py-2 text-sm text-metin placeholder:text-metin-ikincil transition-colors dark:bg-white/5",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:border-transparent",
-          "disabled:cursor-not-allowed disabled:opacity-50",
-          hataliMi
-            ? "border-tehlike focus-visible:ring-tehlike"
-            : "border-kenarlik focus-visible:ring-birincil-500",
+          "h-11 w-full rounded-xl border bg-surface px-3.5 text-sm text-foreground placeholder:text-muted-foreground transition-colors",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 focus-visible:border-primary-500",
+          error ? "border-danger" : "border-border",
           className
         )}
+        aria-invalid={!!error}
         {...props}
       />
     );
   }
 );
-Girdi.displayName = "Girdi";
+Input.displayName = "Input";
 
-export { Girdi };
+export function FormField({
+  label,
+  htmlFor,
+  error,
+  children,
+}: {
+  label: string;
+  htmlFor: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={htmlFor} className="text-sm font-medium text-foreground">
+        {label}
+      </label>
+      {children}
+      {error && <p className="text-xs text-danger">{error}</p>}
+    </div>
+  );
+}

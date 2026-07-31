@@ -3,7 +3,7 @@
 import { FolderPlus, Loader2, Palette, Pencil, Plus, Save, X } from "lucide-react";
 import type { FormEvent } from "react";
 
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
 import { Girdi } from "@/components/ui/input";
 import { Etiket } from "@/components/ui/label";
@@ -62,7 +62,7 @@ export function KategoriFormu({ form, onFormDegistir, duzenlenenId, kaydediliyor
             <Etiket htmlFor="ad" className="text-xs font-bold text-metin">
               Kategori Adı <span className="text-tehlike">*</span>
             </Etiket>
-            <Girdi
+            <Input
               id="ad"
               value={form.ad}
               onChange={(e) => onFormDegistir({ ...form, ad: e.target.value })}
@@ -76,7 +76,7 @@ export function KategoriFormu({ form, onFormDegistir, duzenlenenId, kaydediliyor
             <Etiket htmlFor="departman" className="text-xs font-bold text-metin">
               Sorumlu Müdürlük <span className="text-tehlike">*</span>
             </Etiket>
-            <Girdi
+            <Input
               id="departman"
               value={form.sorumlu_departman}
               onChange={(e) => onFormDegistir({ ...form, sorumlu_departman: e.target.value })}
@@ -90,7 +90,7 @@ export function KategoriFormu({ form, onFormDegistir, duzenlenenId, kaydediliyor
             <Etiket htmlFor="aciklama" className="text-xs font-bold text-metin">
               Açıklama &amp; Vatandaş Yönlendirme Notu
             </Etiket>
-            <Girdi
+            <Input
               id="aciklama"
               value={form.aciklama}
               onChange={(e) => onFormDegistir({ ...form, aciklama: e.target.value })}
@@ -117,7 +117,7 @@ export function KategoriFormu({ form, onFormDegistir, duzenlenenId, kaydediliyor
                 className="h-10 w-14 cursor-pointer rounded-xl border-0 bg-transparent p-1"
                 aria-label="Kategori rengini seç"
               />
-              <Girdi
+              <Input
                 type="text"
                 value={form.renk}
                 onChange={(e) => onFormDegistir({ ...form, renk: e.target.value })}
@@ -143,12 +143,12 @@ export function KategoriFormu({ form, onFormDegistir, duzenlenenId, kaydediliyor
 
           <div className="flex items-center justify-end gap-3 border-t border-kenarlik/60 pt-5 sm:col-span-2">
             {duzenlenenId && (
-              <Dugme type="button" varyant="cam" onClick={onIptal} className="gap-2">
+              <Button type="button" varyant="cam" onClick={onIptal} className="gap-2">
                 <X size={16} aria-hidden="true" />
                 <span>İptal</span>
-              </Dugme>
+              </Button>
             )}
-            <Dugme
+            <Button
               type="submit"
               varyant="birincil"
               boyut="normal"
@@ -171,7 +171,7 @@ export function KategoriFormu({ form, onFormDegistir, duzenlenenId, kaydediliyor
                   <span>Kategori Ekle</span>
                 </>
               )}
-            </Dugme>
+            </Button>
           </div>
 
         </form>

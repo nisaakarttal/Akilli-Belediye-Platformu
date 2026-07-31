@@ -1,38 +1,62 @@
-import { api } from "@/lib/api";
+import { apiClient } from "./client";
+import type {
+  AktiviteKaydi,
+  GenelIstatistikler,
+  GunlukTalep,
+  KategoriDagilimi,
+  MahalleAnalizi,
+  MahalleDagilimi,
+  MemnuniyetKategori,
+  MemnuniyetPersonel,
+  PersonelPerformansi,
+  SayfalanmisYanit,
+} from "@/types";
 
-export interface GenelIstatistik {
-  toplam_talep: number;
-  bugunku_talep: number;
-  bu_hafta_talep: number;
-  bu_ay_talep: number;
-  cozulen_talep: number;
-  bekleyen_talep: number;
-  tamamlanma_orani: number;
+export async function genelIstatistikleriGetir(): Promise<GenelIstatistikler> {
+  const { data } = await apiClient.get<GenelIstatistikler>("/admin/istatistikler");
+  return data;
 }
 
-export interface KategoriDagilimNoktasi {
-  kategori_adi: string;
-  sayi: number;
+export async function kategoriDagilimiGetir(): Promise<KategoriDagilimi[]> {
+  const { data } = await apiClient.get<KategoriDagilimi[]>("/admin/istatistikler/kategori-dagilimi");
+  return data;
 }
 
-export interface MahalleDagilimNoktasi {
-  mahalle_adi: string;
-  sayi: number;
+export async function mahalleDagilimiGetir(): Promise<MahalleDagilimi[]> {
+  const { data } = await apiClient.get<MahalleDagilimi[]>("/admin/istatistikler/mahalle-dagilimi");
+  return data;
 }
 
-export interface GunlukTalepNoktasi {
-  tarih: string;
-  sayi: number;
+export async function gunlukTalepleriGetir(gunSayisi = 30): Promise<GunlukTalep[]> {
+  const { data } = await apiClient.get<GunlukTalep[]>("/admin/istatistikler/gunluk-talepler", {
+    params: { gun_sayisi: gunSayisi },
+  });
+  return data;
 }
 
-export const adminApi = {
-  genelIstatistikler: () => api.get<GenelIstatistik>("/admin/istatistikler").then((r) => r.data),
-  kategoriDagilimi: () =>
-    api.get<KategoriDagilimNoktasi[]>("/admin/istatistikler/kategori-dagilimi").then((r) => r.data),
-  mahalleDagilimi: () =>
-    api.get<MahalleDagilimNoktasi[]>("/admin/istatistikler/mahalle-dagilimi").then((r) => r.data),
-  gunlukTalepler: (gunSayisi = 30) =>
-    api
-      .get<GunlukTalepNoktasi[]>("/admin/istatistikler/gunluk-talepler", { params: { gun_sayisi: gunSayisi } })
-      .then((r) => r.data),
-};
+export async function mahalleAnaliziGetir(): Promise<MahalleAnalizi[]> {
+  const { data } = await apiClient.get<MahalleAnalizi[]>("/admin/istatistikler/mahalle-analizi");
+  return data;
+}
+
+export async function personelPerformansiGetir(): Promise<PersonelPerformansi[]> {
+  const { data } = await apiClient.get<PersonelPerformansi[]>("/admin/istatistikler/personel-performans");
+  return data;
+}
+
+export async function memnuniyetPersonelGetir(): Promise<MemnuniyetPersonel[]> {
+  const { data } = await apiClient.get<MemnuniyetPersonel[]>("/admin/istatistikler/memnuniyet-personel");
+  return data;
+}
+
+export async function memnuniyetKategoriGetir(): Promise<MemnuniyetKategori[]> {
+  const { data } = await apiClient.get<MemnuniyetKategori[]>("/admin/istatistikler/memnuniyet-kategori");
+  return data;
+}
+
+export async function aktiviteKayitlariniListele(sayfa = 1, sayfaBoyutu = 20): Promise<SayfalanmisYanit<AktiviteKaydi>> {
+  const { data } = await apiClient.get<SayfalanmisYanit<AktiviteKaydi>>("/admin/aktivite-kayitlari", {
+    params: { sayfa, sayfa_boyutu: sayfaBoyutu },
+  });
+  return data;
+}

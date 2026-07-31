@@ -1,56 +1,34 @@
-import { forwardRef, type HTMLAttributes } from "react";
-
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
-const Kart = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
+export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
     <div
-      ref={ref}
       className={cn(
-        "cam-kart rounded-2xl shadow-cam transition-shadow duration-200 dark:shadow-cam-koyu",
+        "rounded-2xl border border-border bg-surface shadow-card",
         className
       )}
       {...props}
     />
-  )
-);
-Kart.displayName = "Kart";
+  );
+}
 
-const KartBasligi = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex flex-col gap-1.5 p-6", className)} {...props} />
-  )
-);
-KartBasligi.displayName = "KartBasligi";
+export function CardHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex items-center justify-between gap-4 p-5 pb-0", className)} {...props} />;
+}
 
-const KartBaslik = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLHeadingElement>>(
-  ({ className, ...props }, ref) => (
-    <h3
-      ref={ref}
-      className={cn("text-xl font-semibold leading-none tracking-tight text-metin", className)}
-      {...props}
-    />
-  )
-);
-KartBaslik.displayName = "KartBaslik";
+export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
+  return <h3 className={cn("font-display text-[15px] font-semibold text-foreground", className)} {...props} />;
+}
 
-const KartAciklama = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLParagraphElement>>(
-  ({ className, ...props }, ref) => (
-    <p ref={ref} className={cn("text-sm text-metin-ikincil", className)} {...props} />
-  )
-);
-KartAciklama.displayName = "KartAciklama";
+export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
+  return <p className={cn("text-sm text-muted-foreground", className)} {...props} />;
+}
 
-const KartIcerik = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
-);
-KartIcerik.displayName = "KartIcerik";
+export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("p-5", className)} {...props} />;
+}
 
-const KartAlti = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
-  ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("flex items-center p-6 pt-0", className)} {...props} />
-  )
-);
-KartAlti.displayName = "KartAlti";
-
-export { Kart, KartBasligi, KartBaslik, KartAciklama, KartIcerik, KartAlti };
+export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return <div className={cn("flex items-center gap-3 p-5 pt-0", className)} {...props} />;
+}

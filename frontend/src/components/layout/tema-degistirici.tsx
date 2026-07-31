@@ -4,7 +4,7 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
-import { Dugme } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 
 const TEMA_SIMGE_BOYUTU = 18;
 
@@ -22,13 +22,13 @@ export function TemaDegistirici() {
   const karanlikMi = theme === "dark";
 
   return (
-    <Dugme
+    <Button
       varyant="hayalet"
       boyut="simge"
       onClick={() => setTheme(karanlikMi ? "light" : "dark")}
       aria-label={karanlikMi ? "Aydınlık moda geç" : "Karanlık moda geç"}
     >
       {karanlikMi ? <Sun size={TEMA_SIMGE_BOYUTU} /> : <Moon size={TEMA_SIMGE_BOYUTU} />}
-    </Dugme>
+    </Button>
   );
 }

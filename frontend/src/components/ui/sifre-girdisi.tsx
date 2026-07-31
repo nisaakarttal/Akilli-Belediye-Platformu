@@ -18,7 +18,7 @@ export const SifreGirdisi = forwardRef<HTMLInputElement, InputHTMLAttributes<HTM
 
     return (
       <div className="relative">
-        <Girdi ref={ref} type={goster ? "text" : "password"} className={cn("pr-10", className)} {...props} />
+        <Input ref={ref} type={goster ? "text" : "password"} className={cn("pr-10", className)} {...props} />
         <button
           type="button"
           onClick={() => setGoster((oncekiDeger) => !oncekiDeger)}
