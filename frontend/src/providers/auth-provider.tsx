@@ -75,7 +75,7 @@ export function useRoleGuard(izinliRoller: Kullanici["rol"][]) {
       return;
     }
     if (!izinliRoller.includes(kullanici.rol)) {
-      router.replace("/panel");
+      router.replace(kullanici.rol === "admin" ? "/admin" : kullanici.rol === "personel" ? "/personel" : "/panel");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kullanici, yukleniyor]);

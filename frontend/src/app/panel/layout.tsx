@@ -10,10 +10,7 @@ export default function PanelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { kullanici, yukleniyor } = useRoleGuard([
-    "vatandas",
-    "personel",
-  ]);
+  const { kullanici, yukleniyor } = useRoleGuard(["vatandas"]);
 
   if (yukleniyor || !kullanici) {
     return (

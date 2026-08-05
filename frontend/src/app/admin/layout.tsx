@@ -2,7 +2,6 @@
 
 import { DashboardSidebar } from "@/components/layout/dashboard-sidebar";
 import { DashboardTopbar } from "@/components/layout/dashboard-topbar";
-import { AiSohbetWidget } from "@/components/features/ai/sohbet-widget";
 import { useRoleGuard } from "@/providers/auth-provider";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -23,7 +22,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <DashboardTopbar baslik={`Hoş Geldiniz, ${kullanici.ad} 👋`} />
         <main className="flex-1 p-5">{children}</main>
       </div>
-      <AiSohbetWidget />
     </div>
   );
 }

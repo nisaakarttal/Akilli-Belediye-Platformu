@@ -36,7 +36,7 @@ export default function GirisSayfasi() {
     try {
       const kullanici = await girisYap(degerler);
       toast.success(`Hoş geldiniz, ${kullanici.ad}!`);
-      router.push("/panel");
+      router.push(kullanici.rol === "admin" ? "/admin" : kullanici.rol === "personel" ? "/personel" : "/panel");
     } catch (hata) {
       toast.error(apiHataMesaji(hata, "E-posta veya şifre hatalı."));
     }

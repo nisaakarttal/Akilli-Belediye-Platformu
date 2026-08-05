@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, Query, Request, UploadFile, status
 from sqlalchemy.orm import Session, joinedload
 
-from app.api.deps import gecerli_kullanicial, sadece_personel_ve_admin
+from app.api.deps import gecerli_kullanicial, sadece_admin, sadece_personel_ve_admin
 from app.core.database import get_db
 from app.core.limiter import kullanici_limiter
 from app.models.aktivite_kaydi import AktiviteKaydi
@@ -33,6 +33,7 @@ from app.schemas.talep import (
 )
 from app.services.bildirim_servisi import bildirim_olustur
 from app.services.arkaplan_gorevleri import arka_planda_kucuk_onizleme_olustur
+from app.services.talep_yetki_servisi import personel_notu_mu, personelin_guncel_atamasi_var_mi, personelin_guncel_talep_sorgusu
 from app.utils.dosya_yardimcisi import dosya_kaydet
 from app.utils.takip_no import takip_no_uret
 from app.core.config import get_settings
@@ -55,10 +56,19 @@ def _talep_sorgu_temel(db: Session):
     )
 
 
-def _erisim_kontrolu(talep: Talep, kullanici: Kullanici) -> None:
-    """Vatandaşların yalnızca kendi taleplerine erişebilmesini garanti eder."""
+def _erisim_kontrolu(talep: Talep, kullanici: Kullanici, db: Session) -> None:
+    """Vatandaşın kendi talebini, personelin ise yalnızca güncel atamasını görmesini sağlar."""
     if kullanici.rol == KullaniciRolu.VATANDAS and talep.olusturan_id != kullanici.id:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Bu talebe erişim yetkiniz yok.")
+    if kullanici.rol == KullaniciRolu.PERSONEL and not personelin_guncel_atamasi_var_mi(db, talep.id, kullanici.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Bu talep güncel olarak size atanmış değil.")
+
+
+def _vatandasa_acik_detay(talep: Talep) -> TalepDetayYaniti:
+    """Personel iç notlarını vatandaş/public talep geçmişinden çıkarır."""
+    yanit = TalepDetayYaniti.model_validate(talep)
+    yanit.durum_gecmisi = [kayit for kayit in yanit.durum_gecmisi if not personel_notu_mu(kayit.aciklama)]
+    return yanit
 
 
 @router.post("/", response_model=TalepDetayYaniti, status_code=status.HTTP_201_CREATED)
@@ -140,6 +150,10 @@ def talepleri_listele(
 
     if kullanici.rol == KullaniciRolu.VATANDAS:
         sorgu = sorgu.filter(Talep.olusturan_id == kullanici.id)
+    elif kullanici.rol == KullaniciRolu.PERSONEL:
+        sorgu = personelin_guncel_talep_sorgusu(db, kullanici.id).options(
+            joinedload(Talep.kategori), joinedload(Talep.mahalle), joinedload(Talep.olusturan)
+        )
 
     if durum is not None:
         sorgu = sorgu.filter(Talep.durum == durum)
@@ -196,8 +210,13 @@ def geciken_talepleri_listele(
 ):
     """SLA süresi (son_cozum_tarihi) geçmiş, henüz çözülmemiş/kapatılmamış talepleri listeler. Personel/yönetici."""
     simdi = datetime.now(timezone.utc)
+    sorgu = _talep_sorgu_temel(db)
+    if kullanici.rol == KullaniciRolu.PERSONEL:
+        sorgu = personelin_guncel_talep_sorgusu(db, kullanici.id).options(
+            joinedload(Talep.kategori), joinedload(Talep.mahalle), joinedload(Talep.olusturan)
+        )
     return (
-        _talep_sorgu_temel(db)
+        sorgu
         .filter(Talep.son_cozum_tarihi.isnot(None))
         .filter(Talep.son_cozum_tarihi < simdi)
         .filter(Talep.durum.notin_([TalepDurumu.COZULDU, TalepDurumu.KAPATILDI]))
@@ -212,7 +231,7 @@ def takip_no_ile_sorgula(takip_no: str, db: Session = Depends(get_db)):
     talep = _talep_sorgu_temel(db).filter(Talep.takip_no == takip_no).first()
     if talep is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bu takip numarasına ait talep bulunamadı.")
-    return talep
+    return _vatandasa_acik_detay(talep)
 
 
 @router.get("/{talep_id}", response_model=TalepDetayYaniti)
@@ -226,7 +245,9 @@ def talep_getir(
     if talep is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talep bulunamadı.")
 
-    _erisim_kontrolu(talep, kullanici)
+    _erisim_kontrolu(talep, kullanici, db)
+    if kullanici.rol == KullaniciRolu.VATANDAS:
+        return _vatandasa_acik_detay(talep)
     return talep
 
 
@@ -244,7 +265,7 @@ def talep_dosyasi_yukle(
     if talep is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talep bulunamadı.")
 
-    _erisim_kontrolu(talep, kullanici)
+    _erisim_kontrolu(talep, kullanici, db)
 
     if dosya_turu == DosyaTuru.SONUC_FOTOGRAFI and kullanici.rol == KullaniciRolu.VATANDAS:
         raise HTTPException(
@@ -337,7 +358,7 @@ def talep_durumunu_guncelle(
     talep_id: uuid.UUID,
     istek: TalepDurumGuncelleIstegi,
     db: Session = Depends(get_db),
-    kullanici: Kullanici = Depends(sadece_personel_ve_admin),
+    kullanici: Kullanici = Depends(sadece_admin),
 ):
     """Bir talebin durumunu günceller ve zaman tüneline (durum geçmişi) kayıt ekler. Personel/yönetici."""
     talep = db.query(Talep).filter(Talep.id == talep_id).first()
@@ -386,7 +407,7 @@ def memnuniyet_bildir(
     if talep is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talep bulunamadı.")
 
-    _erisim_kontrolu(talep, kullanici)
+    _erisim_kontrolu(talep, kullanici, db)
 
     if talep.durum not in (TalepDurumu.COZULDU, TalepDurumu.KAPATILDI):
         raise HTTPException(
@@ -424,7 +445,7 @@ def memnuniyet_getir(
     if talep is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Talep bulunamadı.")
 
-    _erisim_kontrolu(talep, kullanici)
+    _erisim_kontrolu(talep, kullanici, db)
 
     memnuniyet = db.query(Memnuniyet).filter(Memnuniyet.talep_id == talep_id).first()
     if memnuniyet is None:
@@ -440,7 +461,7 @@ def talep_ata(
     talep_id: uuid.UUID,
     istek: TalepAtaIstegi,
     db: Session = Depends(get_db),
-    kullanici: Kullanici = Depends(sadece_personel_ve_admin),
+    kullanici: Kullanici = Depends(sadece_admin),
 ):
     """Bir talebi bir personele atar. Personel/yönetici."""
     talep = db.query(Talep).filter(Talep.id == talep_id).first()
@@ -491,7 +512,7 @@ def talep_coz(
     talep_id: uuid.UUID,
     istek: TalepCozIstegi,
     db: Session = Depends(get_db),
-    kullanici: Kullanici = Depends(sadece_personel_ve_admin),
+    kullanici: Kullanici = Depends(sadece_admin),
 ):
     """Bir talebi çözüldü olarak işaretler. Personel/yönetici."""
     talep = db.query(Talep).filter(Talep.id == talep_id).first()

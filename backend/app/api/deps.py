@@ -79,4 +79,5 @@ def rol_gerektir(*izinli_roller: KullaniciRolu):
 
 
 sadece_admin = rol_gerektir(KullaniciRolu.ADMIN)
+sadece_personel = rol_gerektir(KullaniciRolu.PERSONEL)
 sadece_personel_ve_admin = rol_gerektir(KullaniciRolu.PERSONEL, KullaniciRolu.ADMIN)
