@@ -98,51 +98,15 @@ Rol bazlı erişim kontrolü backend tarafında uygulanmaktadır. Kullanıcılar
 
 ---
 
-# Teknoloji Yığını
+## Teknoloji Yığını
 
-## Frontend
-
-* Next.js 15
-* React
-* TypeScript
-* Tailwind CSS
-* shadcn/ui
-* Framer Motion
-* React Hook Form
-* Zod
-* TanStack Query
-* Leaflet
-* Chart.js
-* Lucide Icons
-
-## Backend
-
-* FastAPI
-* Python
-* SQLAlchemy 2.0
-* Alembic
-* PostgreSQL 16
-* Pydantic v2
-* JWT / python-jose
-* Passlib / BCrypt
-* Pytest
-
-## Yapay Zekâ
-
-* Google Gemini API
-* AI servis katmanı
-* Yapay zekâ destekli belediye asistanı
-
-## Harita
-
-* Leaflet
-* OpenStreetMap
-
-## DevOps
-
-* Docker
-* Docker Compose
-* Nginx
+| Katman | Teknolojiler |
+|--------|--------------|
+| **Frontend** | Next.js 15, React, TypeScript, Tailwind CSS, shadcn/ui, Framer Motion, React Hook Form, Zod, TanStack Query, Leaflet, Chart.js, Lucide Icons |
+| **Backend** | FastAPI, Python, SQLAlchemy 2.0, Alembic, PostgreSQL 16, Pydantic v2, JWT / python-jose, Passlib / BCrypt, Pytest |
+| **Yapay Zekâ** | Google Gemini API, AI servis katmanı, Yapay zekâ destekli belediye asistanı |
+| **Harita** | Leaflet, OpenStreetMap |
+| **DevOps** | Docker, Docker Compose, Nginx |
 
 ---
 
