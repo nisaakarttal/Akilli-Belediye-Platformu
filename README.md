@@ -18,20 +18,25 @@ Platform üç temel kullanıcı grubuna yönelik geliştirilmiştir:
 
 ---
 
-## Problem - Çözüm
-Vatandaş talepleri farklı kanallardan alınır → takip zorlaşır
-Süreç şeffaflığı azalır
-Talepler doğru kişiye geç iletilemez
-SLA ihlalleri fark edilemez
-Veriler merkezi analiz edilemez
+## Problem & Çözüm
 
-### Kapaklı Akıllı Belediye Platformu:
+### Problem
 
-Tüm süreci tek dijital sistemde toplar
-Vatandaş: talep oluşturur ve takip eder
-Personel: kendisine atanan işleri yönetir
-Yönetici: süreci analiz eder ve yönlendirir
-Sonuç: daha hızlı, şeffaf ve ölçülebilir belediye hizmeti
+* Vatandaş taleplerinin farklı kanallardan alınması takip süreçlerini zorlaştırır.
+* Vatandaşların başvurularındaki süreç şeffaflığı azalır.
+* Taleplerin doğru personele yönlendirilmesi gecikebilir.
+* SLA sürelerini aşan taleplerin tespit edilmesi zorlaşabilir.
+* Belediye hizmetlerine ilişkin verilerin merkezi olarak analiz edilmesi güçleşir.
+
+### Çözüm
+
+**Kapaklı Akıllı Belediye Platformu**, tüm talep yönetim sürecini tek bir dijital sistem altında toplar.
+
+* **Vatandaş:** Talep oluşturur, konumlandırır ve süreci takip eder.
+* **Personel:** Kendisine atanan talepleri yönetir, durum günceller ve vatandaşı bilgilendirir.
+* **Yönetici:** Talepleri personele yönlendirir, sistemi yönetir ve hizmet süreçlerini analiz eder.
+* **Sonuç:** Daha hızlı, şeffaf, takip edilebilir ve ölçülebilir belediye hizmetleri sunulur.
+
 ---
 
 # Temel Özellikler
@@ -83,11 +88,11 @@ Sonuç: daha hızlı, şeffaf ve ölçülebilir belediye hizmeti
 
 Platform üç temel kullanıcı rolüne sahiptir.
 
-| Rol                       | Yetki                                                                                                                  |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| **Vatandaş (`vatandas`)** | Talep oluşturur, kendi taleplerini takip eder, bildirimleri görüntüler ve memnuniyet değerlendirmesi yapar.            |
-| **Personel (`personel`)** | Kendisine atanmış talepleri yönetir, durum günceller, işlem/çözüm notları ekler ve vatandaşı bilgilendirir.            |
-| **Yönetici (`admin`)**    | Sistemin tamamını yönetir, talepleri personele atar, kullanıcı/kategori yönetimi ve analiz işlemlerini gerçekleştirir. |
+| Rol                               | Yetki                                                                                                                  |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Vatandaş (****`vatandas`****)** | Talep oluşturur, kendi taleplerini takip eder, bildirimlerini görüntüler ve memnuniyet değerlendirmesi yapar.          |
+| **Personel (****`personel`****)** | Kendisine atanmış talepleri yönetir, durum günceller, işlem/çözüm notları ekler ve vatandaşı bilgilendirir.            |
+| **Yönetici (****`admin`****)**    | Sistemin tamamını yönetir, talepleri personele atar, kullanıcı/kategori yönetimi ve analiz işlemlerini gerçekleştirir. |
 
 Rol bazlı erişim kontrolü backend tarafında uygulanmaktadır. Kullanıcılar yetkileri dışında kalan kaynaklara erişemez.
 
@@ -265,7 +270,7 @@ Kategorilere göre farklı SLA süreleri tanımlanabilir. Talebin oluşturulma t
 
 Sistem bu süreyi aşan ve henüz tamamlanmamış talepleri geciken talep olarak belirleyebilir.
 
-Talep yaşam döngüsü temel olarak:
+Talep yaşam döngüsü:
 
 ```text
 Bekliyor
@@ -278,8 +283,6 @@ Atandı
    ↓
 Kapatıldı
 ```
-
-şeklinde yönetilmektedir.
 
 ---
 
@@ -312,16 +315,14 @@ Backend testleri **Pytest** kullanılarak geliştirilmiştir.
 
 Testler üretim veritabanından bağımsız ayrı bir PostgreSQL test veritabanında çalıştırılmaktadır.
 
-Test kapsamında başlıca:
+Test kapsamında:
 
-* Authentication
-* Authorization
+* Authentication ve Authorization
 * JWT
 * RBAC
 * Kullanıcı işlemleri
 * Talep yönetimi
-* Personel yetkilendirmesi
-* Admin yetkilendirmesi
+* Personel ve Admin yetkilendirmesi
 * Bildirim sistemi
 * Kategori yönetimi
 * Dosya yükleme güvenliği
@@ -331,7 +332,7 @@ Test kapsamında başlıca:
 
 test edilmektedir.
 
-Mevcut test sonucu:
+### Güncel Test Sonucu
 
 ```text
 64 passed
@@ -339,7 +340,7 @@ Mevcut test sonucu:
 0 skipped
 ```
 
-Toplam backend test coverage:
+### Backend Test Coverage
 
 ```text
 69%
@@ -347,7 +348,7 @@ Toplam backend test coverage:
 
 Testleri çalıştırmak için:
 
-```bash
+```powershell
 cd backend
 
 $env:TEST_DATABASE_URL="postgresql+psycopg2://KULLANICI:SIFRE@localhost:5432/kapakli_belediye_test"
@@ -375,19 +376,17 @@ cd kapakli-belediye
 
 Gerekli `.env` dosyalarını oluşturun ve veritabanı, JWT ve Gemini API yapılandırmalarını tanımlayın.
 
-Ardından:
-
 ```bash
 docker compose up --build
 ```
 
-Servisleri arka planda çalıştırmak için:
+Arka planda çalıştırmak için:
 
 ```bash
 docker compose up -d --build
 ```
 
-Servisleri durdurmak için:
+Durdurmak için:
 
 ```bash
 docker compose down
@@ -399,49 +398,25 @@ docker compose down
 
 ## Backend
 
-Python sanal ortamını oluşturun:
-
-```bash
+```powershell
 cd backend
 
 python -m venv venv
-```
-
-Windows:
-
-```bash
 venv\Scripts\activate
-```
 
-Bağımlılıkları yükleyin:
-
-```bash
 pip install -r requirements.txt
-```
-
-PostgreSQL veritabanını oluşturun ve `.env` içerisindeki bağlantı bilgilerini yapılandırın.
-
-Migration işlemlerini uygulayın:
-
-```bash
 alembic upgrade head
-```
 
-Backend'i başlatın:
-
-```bash
 uvicorn app.main:app --reload
 ```
 
-Backend varsayılan olarak:
+Backend:
 
 ```text
 http://localhost:8000
 ```
 
-adresinde çalışır.
-
-API dokümantasyonu:
+Swagger:
 
 ```text
 http://localhost:8000/docs
@@ -453,35 +428,21 @@ Yeni terminal açın:
 
 ```bash
 cd frontend
-```
-
-Bağımlılıkları yükleyin:
-
-```bash
 npm install
-```
-
-Frontend'i başlatın:
-
-```bash
 npm run dev
 ```
 
-Frontend varsayılan olarak:
+Frontend:
 
 ```text
 http://localhost:3000
 ```
 
-adresinde çalışır.
-
 ---
 
 # Ortam Değişkenleri
 
-Projenin çalışması için backend ve frontend ortam değişkenlerinin yapılandırılması gerekir.
-
-Örnek backend değişkenleri:
+Örnek backend yapılandırması:
 
 ```env
 DATABASE_URL=postgresql+psycopg2://kullanici:sifre@localhost:5432/kapakli_belediye
@@ -495,19 +456,17 @@ Frontend:
 NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
 ```
 
-Gerçek API anahtarları, veritabanı şifreleri ve JWT secret değerleri GitHub repository'sine gönderilmemelidir.
+> Gerçek API anahtarları, veritabanı şifreleri ve JWT secret değerleri GitHub repository'sine gönderilmemelidir.
 
 ---
 
 # API Dokümantasyonu
 
-Backend çalıştırıldıktan sonra FastAPI tarafından otomatik oluşturulan Swagger dokümantasyonuna:
+Backend çalıştırıldıktan sonra FastAPI tarafından otomatik oluşturulan Swagger dokümantasyonuna aşağıdaki adresten erişilebilir:
 
 ```text
 http://localhost:8000/docs
 ```
-
-adresinden erişilebilir.
 
 API versioning altyapısı kapsamında endpointler `/api/v1` ve geliştirilen yeni sürümler için `/api/v2` altında yönetilebilmektedir.
 
@@ -517,7 +476,7 @@ API versioning altyapısı kapsamında endpointler `/api/v1` ve geliştirilen ye
 
 Platformun temel backend altyapısı, rol bazlı yetkilendirme sistemi, vatandaş/personel/admin talep süreçleri, bildirim sistemi, SLA yönetimi, vatandaş memnuniyeti ve test altyapısı uygulanmıştır.
 
-Planlanan sonraki geliştirmeler:
+Planlanan geliştirmeler:
 
 * Admin kullanıcıları için 2FA
 * Test coverage oranının artırılması
@@ -529,8 +488,5 @@ Planlanan sonraki geliştirmeler:
 * AI ile öncelik seviyesi belirleme
 * AI ile ilgili belediye birimine otomatik yönlendirme
 
----
-
 # Lisans
-
 Bu proje **Kapaklı Belediyesi** için geliştirilmektedir.
