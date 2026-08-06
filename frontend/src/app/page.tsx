@@ -105,10 +105,10 @@ export default function AnaSayfa() {
             </div>
 
             <div className="relative animate-scale-in">
-              <div className="aspect-[4/3] overflow-hidden rounded-3xl border border-border shadow-card">
+              <div className="aspect-[4/4] overflow-hidden rounded-3xl border border-border shadow-card">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=1200&auto=format&fit=crop"
+                  src="https://www.kapakli.bel.tr/_uploads/demo/kapakli-belediyesi.jpg"
                   alt="Şehir merkezi ve belediye binası"
                   className="h-full w-full object-cover"
                 />
@@ -263,7 +263,7 @@ export default function AnaSayfa() {
               <Link href="/panel/harita" className="font-medium text-primary-700 hover:underline">
                 harita sayfasında
               </Link>{" "}
-              (Leaflet + OpenStreetMap, <code className="text-xs">/api/v1/talepler/harita</code>) canlı olarak görüntülenir.
+              (Leaflet + OpenStreetMap, <code className="text-xs"></code>) canlı olarak görüntülenir.
             </p>
           </Card>
         </section>

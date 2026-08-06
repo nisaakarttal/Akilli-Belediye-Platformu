@@ -10,7 +10,8 @@ import { dosyaTuruTahminEt } from "@/components/sikayet/dosya-yukleme";
 import { KAPAKLI_MERKEZ_KOORDINATLARI } from "@/constants/konum";
 import { apiHataMesaji } from "@/lib/api";
 import { aiApi } from "@/lib/api/ai";
-import { kategorilerApi, konumApi } from "@/lib/api/konum";
+import { kategorilerApi } from "@/lib/api/kategoriler";
+import { konumApi } from "@/lib/api/konum";
 import { taleplerApi } from "@/lib/api/talepler";
 import {
   TALEP_ACIKLAMA_MIN_UZUNLUK,
@@ -120,7 +121,7 @@ export function useTalepOlusturFormu() {
         await taleplerApi.dosyaYukle(talep.id, dosya, dosyaTuruTahminEt(dosya.name));
       }
 
-      router.push(`/taleplerim/${talep.id}`);
+      router.push(`/panel/taleplerim/${talep.id}`);
     } catch (hata) {
       setSunucuHatasi(apiHataMesaji(hata, "Talep oluşturulamadı. Lütfen bilgilerinizi kontrol ediniz."));
     } finally {

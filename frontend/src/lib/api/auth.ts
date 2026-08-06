@@ -36,3 +36,7 @@ export function cikisYap() {
     window.location.href = "/giris";
   }
 }
+
+export async function sifreDegistir(mevcut_sifre: string, yeni_sifre: string): Promise<void> {
+  await apiClient.post("/auth/sifre-degistir", { mevcut_sifre, yeni_sifre });
+}

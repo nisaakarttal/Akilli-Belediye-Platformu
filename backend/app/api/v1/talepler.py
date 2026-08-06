@@ -180,9 +180,14 @@ def talepleri_haritada_goster(
     durum: TalepDurumu | None = None,
     kategori_id: uuid.UUID | None = None,
     db: Session = Depends(get_db),
+    kullanici: Kullanici = Depends(gecerli_kullanicial),
 ):
-    """Harita bileşeni için talep konumlarını GeoJSON benzeri formatta döner. Girişsiz erişilebilir."""
+    """Harita noktalarını rol kapsamına göre döner; hassas konumlar anonim erişime açılmaz."""
     sorgu = db.query(Talep).options(joinedload(Talep.kategori))
+    if kullanici.rol == KullaniciRolu.VATANDAS:
+        sorgu = sorgu.filter(Talep.olusturan_id == kullanici.id)
+    elif kullanici.rol == KullaniciRolu.PERSONEL:
+        sorgu = personelin_guncel_talep_sorgusu(db, kullanici.id).options(joinedload(Talep.kategori))
     if durum is not None:
         sorgu = sorgu.filter(Talep.durum == durum)
     if kategori_id is not None:
@@ -231,7 +236,10 @@ def takip_no_ile_sorgula(takip_no: str, db: Session = Depends(get_db)):
     talep = _talep_sorgu_temel(db).filter(Talep.takip_no == takip_no).first()
     if talep is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bu takip numarasına ait talep bulunamadı.")
-    return _vatandasa_acik_detay(talep)
+    _erisim_kontrolu(talep, kullanici, db)
+    if kullanici.rol == KullaniciRolu.VATANDAS:
+        return _vatandasa_acik_detay(talep)
+    return talep
 
 
 @router.get("/{talep_id}", response_model=TalepDetayYaniti)

@@ -53,7 +53,7 @@ export function Hero() {
               className="mt-6 flex flex-wrap items-center justify-center gap-3"
             >
               <motion.div variants={Button_VARYANTI}>
-                <Link href="/sikayet-olustur">
+                <Link href="/panel/talep-olustur">
                   <Button varyant="birincil" boyut="buyuk" className="gap-2">
                     <MessageSquarePlus size={20} aria-hidden="true" />
                     Hızlı Şikâyet Oluştur
@@ -62,7 +62,7 @@ export function Hero() {
               </motion.div>
 
               <motion.div variants={Button_VARYANTI}>
-                <Link href="/taleplerim">
+                <Link href="/panel/taleplerim">
                   <Button varyant="cam" boyut="buyuk" className="gap-2">
                     <Search size={20} aria-hidden="true" />
                     Talep Takip Et
@@ -71,7 +71,7 @@ export function Hero() {
               </motion.div>
 
               <motion.div variants={Button_VARYANTI}>
-                <Link href="/harita">
+                <Link href="/panel/harita">
                   <Button varyant="hayalet" boyut="buyuk" className="gap-2">
                     <MapPin size={20} aria-hidden="true" />
                     Haritada Gör

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
-import { useKimlik } from "@/hooks/use-kimlik";
+import { useAuth } from "@/providers/auth-provider";
 import { bildirimlerApi } from "@/lib/api/bildirimler";
 import type { Bildirim } from "@/types";
 
@@ -13,7 +13,7 @@ export type BildirimFiltresi = "tumu" | "okunmamis" | "okunmus";
 export function useBildirimler() {
   const queryClient = useQueryClient();
   const router = useRouter();
-  const { kullanici } = useKimlik();
+  const { kullanici } = useAuth();
 
   const [filtre, setFiltre] = useState<BildirimFiltresi>("tumu");
 
@@ -55,7 +55,7 @@ export function useBildirimler() {
     } else if (rol.includes("personel")) {
       router.push("/personel");
     } else {
-      router.push("/taleplerim");
+      router.push("/panel/taleplerim");
     }
   }
 

@@ -13,6 +13,7 @@ import {
   BarChart3,
   Settings,
   Sparkles,
+  Star,
   Landmark,
   Home,
 } from "lucide-react";
@@ -37,6 +38,10 @@ const VATANDAS_MENU: NavOgesi[] = [
 
 const PERSONEL_MENU: NavOgesi[] = [
   { href: "/personel", etiket: "Personel Dashboard", ikon: LayoutDashboard },
+  { href: "/personel/atanan-talepler", etiket: "Atanan Talepler", ikon: FileText },
+  { href: "/personel/bildirimler", etiket: "Bildirimler", ikon: Bell },
+  { href: "/personel/memnuniyet", etiket: "Memnuniyet İstatistikleri", ikon: Star },
+  { href: "/personel/ayarlar", etiket: "Ayarlar", ikon: Settings },
 ];
 
 const ADMIN_MENU: NavOgesi[] = [

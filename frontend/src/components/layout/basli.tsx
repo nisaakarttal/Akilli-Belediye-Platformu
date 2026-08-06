@@ -7,7 +7,7 @@ import { useState } from "react";
 
 import { TemaDegistirici } from "@/components/layout/tema-degistirici";
 import { Button } from "@/components/ui/button";
-import { useKimlik } from "@/hooks/use-kimlik";
+import { useAuth } from "@/providers/auth-provider";
 import { bildirimlerApi } from "@/lib/api/bildirimler";
 import { cn } from "@/lib/utils";
 import type { Bildirim, KullaniciRolu } from "@/types";
@@ -38,8 +38,8 @@ function gezinmeBaglantilariniOlustur(rol: KullaniciRolu | undefined): GezinmeBa
 
   if (rol === "vatandas") {
     baglantilar.push(
-      { ad: "Şikâyet Oluştur", yol: "/sikayet-olustur" },
-      { ad: "Taleplerim", yol: "/taleplerim" }
+      { ad: "Şikâyet Oluştur", yol: "/panel/talep-olustur" },
+      { ad: "Taleplerim", yol: "/panel/taleplerim" }
     );
   } else if (rol === "personel") {
     baglantilar.push({ ad: "Atanan Taleplerim", yol: "/personel" });
@@ -47,7 +47,7 @@ function gezinmeBaglantilariniOlustur(rol: KullaniciRolu | undefined): GezinmeBa
     baglantilar.push({ ad: "Talepler", yol: "/admin/talepler" });
   }
 
-  baglantilar.push({ ad: "Harita", yol: "/harita" }, { ad: "Duyurular", yol: "/duyurular" });
+  baglantilar.push({ ad: "Harita", yol: "/panel/harita" }, { ad: "Duyurular", yol: "/duyurular" });
   return baglantilar;
 }
 
@@ -60,7 +60,7 @@ function bildirimOkunmamisMi(bildirim: EsnekBildirim): boolean {
 }
 
 export function Basli() {
-  const { kullanici, cikisYap, yukleniyor } = useKimlik();
+  const { kullanici, cikisYap, yukleniyor } = useAuth();
   const [menuAcikMi, setMenuAcikMi] = useState(false);
 
   // Yalnızca okunmamış bildirimleri çeker, kısa aralıklarla otomatik günceller.
@@ -122,7 +122,7 @@ export function Basli() {
                 </Link>
               )}
 
-              <Link href="/bildirimler" className="relative inline-flex items-center justify-center">
+              <Link href="/panel/bildirimler" className="relative inline-flex items-center justify-center">
                 <Button varyant="hayalet" boyut="simge" aria-label="Bildirimler">
                   <Bell size={BASLIK_IKON_BOYUTU} />
                 </Button>
@@ -134,7 +134,7 @@ export function Basli() {
                 )}
               </Link>
 
-              <Link href="/profil" className="hidden items-center gap-2 sm:flex">
+              <Link href="/panel/profil" className="hidden items-center gap-2 sm:flex">
                 <Button varyant="hayalet" boyut="orta" className="gap-2">
                   <User size={16} />
                   {kullanici.ad}

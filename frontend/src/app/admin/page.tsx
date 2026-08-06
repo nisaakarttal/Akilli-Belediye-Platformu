@@ -15,7 +15,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import { FileText, CheckCircle2, Users, Smile } from "lucide-react";
+import { AlertTriangle, FileText, CheckCircle2, Users, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   genelIstatistikleriGetir,
@@ -47,14 +47,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
         <OzetKarti ikon={FileText} etiket="Toplam Talep" deger={istatistik?.toplam_talep} renk="text-primary-700" />
         <OzetKarti ikon={CheckCircle2} etiket="Çözülen Talep" deger={istatistik?.cozulen_talep} renk="text-success" />
         <OzetKarti ikon={Users} etiket="Bekleyen Talep" deger={istatistik?.bekleyen_talep} renk="text-warning" />
+        <OzetKarti ikon={AlertTriangle} etiket="Geciken" deger={istatistik?.geciken_talep} renk="text-danger" />
+        <OzetKarti ikon={AlertTriangle} etiket="Acil" deger={istatistik?.acil_talep} renk="text-warning" />
         <OzetKarti
-          ikon={Smile}
-          etiket="Tamamlanma Oranı"
-          deger={istatistik ? `%${istatistik.tamamlanma_orani.toFixed(0)}` : undefined}
+          ikon={ShieldCheck}
+          etiket="SLA Başarısı"
+          deger={istatistik ? `%${istatistik.sla_basari_orani.toFixed(0)}` : undefined}
           renk="text-info"
         />
       </div>

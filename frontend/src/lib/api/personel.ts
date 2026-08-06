@@ -4,9 +4,12 @@ import type { DosyaTuru, TalepDetay, TalepDurumu, TalepListe } from "@/types";
 export interface PersonelIstatistikleri {
   toplam: number;
   bekleyen: number;
-  islemde: number;
+  inceleniyor: number;
+  atandi: number;
   cozuldu: number;
+  geciken: number;
   acil: number;
+  son_7_gun_cozulen: number;
 }
 
 export interface PersonelDashboard {
@@ -69,5 +72,28 @@ export async function islemNotuEkle(id: string, not: string): Promise<TalepDetay
 
 export async function vatandasiBilgilendir(id: string, mesaj: string): Promise<TalepDetay> {
   const { data } = await apiClient.post<TalepDetay>(`/personel/atanan-talepler/${id}/bilgilendir`, { mesaj });
+  return data;
+}
+
+export interface PersonelMemnuniyetKaydi {
+  talep_id: string;
+  takip_no: string;
+  baslik: string;
+  puan: number;
+  yorum: string | null;
+  olusturulma_tarihi: string;
+}
+
+export interface PersonelMemnuniyetIstatistikleri {
+  toplam_degerlendirme: number;
+  ortalama_puan: number | null;
+  olumlu_oran: number;
+  bes_yildiz: number;
+  dagilim: Record<number, number>;
+  son_degerlendirmeler: PersonelMemnuniyetKaydi[];
+}
+
+export async function personelMemnuniyetIstatistikleriGetir(): Promise<PersonelMemnuniyetIstatistikleri> {
+  const { data } = await apiClient.get<PersonelMemnuniyetIstatistikleri>("/personel/memnuniyet-istatistikleri");
   return data;
 }

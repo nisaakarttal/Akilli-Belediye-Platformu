@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 
 import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
-import { useKimlik } from "@/hooks/use-kimlik";
+import { useAuth } from "@/providers/auth-provider";
 import type { KullaniciRolu } from "@/types";
 
 export function KorumaliRota({
@@ -15,17 +15,17 @@ export function KorumaliRota({
   /** Belirtilirse yalnızca bu rollerdeki kullanıcılar erişebilir. Boş bırakılırsa her giriş yapmış kullanıcı erişebilir. */
   izinliRoller?: KullaniciRolu[];
 }) {
-  const { kullanici, yukleniyor } = useKimlik();
+  const { kullanici, yukleniyor } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (yukleniyor) return;
     if (!kullanici) {
-      router.push("/giris");
+      router.replace("/giris");
       return;
     }
     if (izinliRoller && !izinliRoller.includes(kullanici.rol)) {
-      router.push("/");
+      router.replace(kullanici.rol === "admin" ? "/admin" : kullanici.rol === "personel" ? "/personel" : "/panel");
     }
   }, [kullanici, yukleniyor, izinliRoller, router]);
 

@@ -5,7 +5,7 @@ import { useMemo, useState, type FormEvent } from "react";
 
 import { BOS_KATEGORI_FORMU, VARSAYILAN_KATEGORI_RENGI } from "@/constants/kategori";
 import { apiHataMesaji } from "@/lib/api";
-import { kategorilerApi, type KategoriIstegi } from "@/lib/api/konum";
+import { kategorilerApi, type KategoriIstegi } from "@/lib/api/kategoriler";
 import type { Kategori } from "@/types";
 
 const KAYIT_BILDIRIM_SURESI_MS = 4000;

@@ -1,10 +1,11 @@
 """Personel uç noktaları — yalnızca personele güncel olarak atanmış taleplerin yönetimi."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from app.api.deps import sadece_personel
@@ -12,6 +13,7 @@ from app.core.database import get_db
 from app.models.bildirim import BildirimTuru
 from app.models.durum_gecmisi import DurumGecmisi
 from app.models.kullanici import Kullanici
+from app.models.memnuniyet import Memnuniyet
 from app.models.talep import Talep, TalepDurumu, TalepOnceligi
 from app.schemas.talep import TalepCozIstegi, TalepDetayYaniti, TalepDurumGuncelleIstegi, TalepListeYaniti
 from app.services.bildirim_servisi import bildirim_olustur
@@ -38,15 +40,36 @@ class VatandasBilgilendirmeIstegi(BaseModel):
 class PersonelIstatistikleri(BaseModel):
     toplam: int
     bekleyen: int
-    islemde: int
+    inceleniyor: int
+    atandi: int
     cozuldu: int
+    geciken: int
     acil: int
+    son_7_gun_cozulen: int
 
 
 class PersonelDashboardYaniti(BaseModel):
     istatistikler: PersonelIstatistikleri
     son_atananlar: list[TalepListeYaniti]
     acil_talepler: list[TalepListeYaniti]
+
+
+class PersonelMemnuniyetKaydi(BaseModel):
+    talep_id: uuid.UUID
+    takip_no: str
+    baslik: str
+    puan: int
+    yorum: str | None
+    olusturulma_tarihi: datetime
+
+
+class PersonelMemnuniyetIstatistikleri(BaseModel):
+    toplam_degerlendirme: int
+    ortalama_puan: float | None
+    olumlu_oran: float
+    bes_yildiz: int
+    dagilim: dict[int, int]
+    son_degerlendirmeler: list[PersonelMemnuniyetKaydi]
 
 
 def _atanmis_talep_sorgusu(db: Session, kullanici: Kullanici):
@@ -91,13 +114,60 @@ def personel_dashboard(
     return PersonelDashboardYaniti(
         istatistikler=PersonelIstatistikleri(
             toplam=len(talepler),
-            bekleyen=sum(t.durum in (TalepDurumu.BEKLIYOR, TalepDurumu.ATANDI) for t in talepler),
-            islemde=sum(t.durum == TalepDurumu.INCELENIYOR for t in talepler),
-            cozuldu=sum(t.durum == TalepDurumu.COZULDU for t in talepler),
+            bekleyen=sum(t.durum == TalepDurumu.BEKLIYOR for t in talepler),
+            inceleniyor=sum(t.durum == TalepDurumu.INCELENIYOR for t in talepler),
+            atandi=sum(t.durum == TalepDurumu.ATANDI for t in talepler),
+            cozuldu=sum(t.durum in (TalepDurumu.COZULDU, TalepDurumu.KAPATILDI) for t in talepler),
+            geciken=sum(t.gecikti_mi for t in talepler),
             acil=sum(t.oncelik == TalepOnceligi.ACIL for t in talepler),
+            son_7_gun_cozulen=sum(
+                t.cozulme_tarihi is not None
+                and t.cozulme_tarihi >= datetime.now(timezone.utc) - timedelta(days=7)
+                for t in talepler
+            ),
         ),
         son_atananlar=talepler[:5],
         acil_talepler=[t for t in talepler if t.oncelik == TalepOnceligi.ACIL][:5],
+    )
+
+
+@router.get("/memnuniyet-istatistikleri", response_model=PersonelMemnuniyetIstatistikleri)
+def personel_memnuniyet_istatistikleri(
+    db: Session = Depends(get_db),
+    kullanici: Kullanici = Depends(sadece_personel),
+):
+    """Personelin halen sorumlu olduğu talepler için vatandaş memnuniyet özetini döndürür."""
+    talep_idleri = personelin_guncel_talep_sorgusu(db, kullanici.id).with_entities(Talep.id).subquery()
+    kayitlar = (
+        db.query(Memnuniyet, Talep)
+        .join(Talep, Talep.id == Memnuniyet.talep_id)
+        .filter(Memnuniyet.talep_id.in_(select(talep_idleri.c.id)))
+        .order_by(Memnuniyet.olusturulma_tarihi.desc())
+        .all()
+    )
+
+    puanlar = [memnuniyet.puan for memnuniyet, _ in kayitlar]
+    toplam = len(puanlar)
+    dagilim = {puan: puanlar.count(puan) for puan in range(1, 6)}
+    olumlu = sum(puan >= 4 for puan in puanlar)
+
+    return PersonelMemnuniyetIstatistikleri(
+        toplam_degerlendirme=toplam,
+        ortalama_puan=round(sum(puanlar) / toplam, 2) if toplam else None,
+        olumlu_oran=round((olumlu / toplam) * 100, 1) if toplam else 0.0,
+        bes_yildiz=dagilim[5],
+        dagilim=dagilim,
+        son_degerlendirmeler=[
+            PersonelMemnuniyetKaydi(
+                talep_id=talep.id,
+                takip_no=talep.takip_no,
+                baslik=talep.baslik,
+                puan=memnuniyet.puan,
+                yorum=memnuniyet.yorum,
+                olusturulma_tarihi=memnuniyet.olusturulma_tarihi,
+            )
+            for memnuniyet, talep in kayitlar[:10]
+        ],
     )
 
 

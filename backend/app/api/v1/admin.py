@@ -57,6 +57,12 @@ def genel_istatistikler(db: Session = Depends(get_db), _: Kullanici = Depends(sa
         .count()
     )
     bekleyen = db.query(Talep).filter(Talep.durum == TalepDurumu.BEKLIYOR).count()
+    tum_talepler = db.query(Talep).all()
+    geciken = sum(t.gecikti_mi for t in tum_talepler)
+    acil = sum(t.oncelik.value == "acil" for t in tum_talepler)
+    sla_olculen = [t for t in tum_talepler if t.son_cozum_tarihi is not None]
+    sla_basarili = sum(not t.gecikti_mi for t in sla_olculen)
+    sla_basari_orani = round((sla_basarili / len(sla_olculen)) * 100, 1) if sla_olculen else 100.0
 
     tamamlanma_orani = round((cozulen / toplam) * 100, 1) if toplam > 0 else 0.0
 
@@ -68,6 +74,9 @@ def genel_istatistikler(db: Session = Depends(get_db), _: Kullanici = Depends(sa
         cozulen_talep=cozulen,
         bekleyen_talep=bekleyen,
         tamamlanma_orani=tamamlanma_orani,
+        geciken_talep=geciken,
+        acil_talep=acil,
+        sla_basari_orani=sla_basari_orani,
     )
     cache_yaz(cache_anahtari, sonuc.model_dump(mode="json"), sure_saniye=DASHBOARD_CACHE_SURESI)
     return sonuc
@@ -231,6 +240,9 @@ def personel_performansi(db: Session = Depends(get_db), _: Kullanici = Depends(s
                 bekleyen_talep=len(bekleyen),
                 ortalama_cozum_suresi_saat=ortalama_sure,
                 tamamlanma_orani=tamamlanma_orani,
+        geciken_talep=geciken,
+        acil_talep=acil,
+        sla_basari_orani=sla_basari_orani,
                 memnuniyet_ortalamasi=memnuniyet_ortalamasi,
                 performans_puani=performans_puani,
             )

@@ -11,6 +11,7 @@ export interface KategoriOlusturIstegi {
 }
 
 export type KategoriGuncelleIstegi = Partial<KategoriOlusturIstegi>;
+export type KategoriIstegi = KategoriOlusturIstegi;
 
 export async function kategorileriListele(): Promise<Kategori[]> {
   const { data } = await apiClient.get<Kategori[]>("/kategoriler");
@@ -39,3 +40,12 @@ export async function kategoriGeriYukle(id: string): Promise<Kategori> {
   const { data } = await apiClient.put<Kategori>(`/kategoriler/${id}/geri-yukle`);
   return data;
 }
+
+export const kategorilerApi = {
+  listele: kategorileriListele,
+  olustur: kategoriOlustur,
+  guncelle: kategoriGuncelle,
+  sil: kategoriSil,
+  pasifYap: kategoriPasifYap,
+  geriYukle: kategoriGeriYukle,
+};

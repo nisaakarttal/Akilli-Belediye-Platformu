@@ -12,6 +12,9 @@ class GenelIstatistikYaniti(BaseModel):
     cozulen_talep: int
     bekleyen_talep: int
     tamamlanma_orani: float
+    geciken_talep: int
+    acil_talep: int
+    sla_basari_orani: float
 
 
 class KategoriDagilimNoktasi(BaseModel):
@@ -47,6 +50,9 @@ class PersonelPerformansNoktasi(BaseModel):
     bekleyen_talep: int
     ortalama_cozum_suresi_saat: float | None
     tamamlanma_orani: float
+    geciken_talep: int
+    acil_talep: int
+    sla_basari_orani: float
     memnuniyet_ortalamasi: float | None
     performans_puani: float
 

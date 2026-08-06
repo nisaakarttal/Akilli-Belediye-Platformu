@@ -5,10 +5,10 @@ import type { FormEvent } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
-import { Girdi } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Etiket } from "@/components/ui/label";
 import { HAZIR_KATEGORI_RENKLERI } from "@/constants/kategori";
-import type { KategoriIstegi } from "@/lib/api/konum";
+import type { KategoriIstegi } from "@/lib/api/kategoriler";
 import { cn } from "@/lib/utils";
 
 interface KategoriFormuProps {

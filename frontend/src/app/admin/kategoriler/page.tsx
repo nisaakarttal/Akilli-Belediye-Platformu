@@ -21,7 +21,7 @@ import { KategoriFormu } from "@/components/admin/kategori-formu";
 import { KategoriKarti } from "@/components/admin/kategori-karti";
 import { KategoriTablosu } from "@/components/admin/kategori-tablosu";
 import { Button } from "@/components/ui/button";
-import { Girdi } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Uyari } from "@/components/ui/uyari";
 import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
 

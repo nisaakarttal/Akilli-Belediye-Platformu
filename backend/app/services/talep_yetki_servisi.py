@@ -6,7 +6,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import Query, Session
 
 from app.models.atama import Atama
-from app.models.talep import Talep
+from app.models.talep import Talep, TalepDurumu
 
 PERSONEL_NOTU_ON_EKI = "[PERSONEL_NOTU] "
 ESKI_PERSONEL_NOTU_ON_EKI = "İşlem notu: "
@@ -69,3 +69,16 @@ def personel_notunu_temizle(aciklama: str | None) -> str | None:
     if aciklama.startswith(PERSONEL_NOTU_ON_EKI):
         return f"İşlem notu: {aciklama[len(PERSONEL_NOTU_ON_EKI):]}"
     return aciklama
+
+
+IZINLI_DURUM_GECISLERI: dict[TalepDurumu, set[TalepDurumu]] = {
+    TalepDurumu.BEKLIYOR: {TalepDurumu.ATANDI},
+    TalepDurumu.ATANDI: {TalepDurumu.INCELENIYOR},
+    TalepDurumu.INCELENIYOR: {TalepDurumu.COZULDU},
+    TalepDurumu.COZULDU: {TalepDurumu.KAPATILDI, TalepDurumu.INCELENIYOR},
+    TalepDurumu.KAPATILDI: set(),
+}
+
+def durum_gecisi_gecerli_mi(mevcut: TalepDurumu, yeni: TalepDurumu) -> bool:
+    """Talep iş akışında geçersiz/atlamalı durum değişikliklerini engeller."""
+    return yeni == mevcut or yeni in IZINLI_DURUM_GECISLERI.get(mevcut, set())

@@ -67,6 +67,18 @@ class SifreSifirlaIstegi(BaseModel):
         return deger
 
 
+class SifreDegistirIstegi(BaseModel):
+    mevcut_sifre: str = Field(..., min_length=1, max_length=100)
+    yeni_sifre: str = Field(..., min_length=8, max_length=100)
+
+    @field_validator("yeni_sifre")
+    @classmethod
+    def yeni_sifre_dogrula(cls, deger: str) -> str:
+        if not re.search(r"[A-Za-z]", deger) or not re.search(r"\d", deger):
+            raise ValueError("Şifre en az bir harf ve bir rakam içermelidir.")
+        return deger
+
+
 class KullaniciGuncelleIstegi(BaseModel):
     """Profil güncelleme — tüm alanlar isteğe bağlıdır (kısmi güncelleme)."""
 

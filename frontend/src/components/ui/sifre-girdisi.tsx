@@ -3,7 +3,7 @@
 import { Eye, EyeOff } from "lucide-react";
 import { forwardRef, useState, type InputHTMLAttributes } from "react";
 
-import { Girdi } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 /**

@@ -32,3 +32,11 @@ export function CardContent({ className, ...props }: React.HTMLAttributes<HTMLDi
 export function CardFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("flex items-center gap-3 p-5 pt-0", className)} {...props} />;
 }
+
+// Projede kullanılan Türkçe UI isimleri için geriye dönük uyumluluk alias'ları.
+export {
+  Card as Kart,
+  CardHeader as KartBasligi,
+  CardTitle as KartBaslik,
+  CardContent as KartIcerik,
+};

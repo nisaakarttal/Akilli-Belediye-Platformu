@@ -20,6 +20,7 @@ from app.schemas.kullanici import (
     KullaniciYaniti,
     SifremiUnuttumIstegi,
     SifreSifirlaIstegi,
+    SifreDegistirIstegi,
     TokenYaniti,
     YenilemeIstegi,
 )
@@ -514,6 +515,40 @@ def sifre_sifirla(
     return MesajYaniti(
         mesaj="Şifreniz başarıyla güncellendi."
     )
+
+
+@router.post("/sifre-degistir", response_model=MesajYaniti)
+def sifre_degistir(
+    istek: SifreDegistirIstegi,
+    db: Session = Depends(get_db),
+    kullanici: Kullanici = Depends(gecerli_kullanicial),
+):
+    """Giriş yapmış kullanıcının şifresini mevcut şifre doğrulamasıyla değiştirir."""
+    if not sifre_dogrula(istek.mevcut_sifre, kullanici.sifre_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Mevcut şifreniz hatalı.",
+        )
+
+    if sifre_dogrula(istek.yeni_sifre, kullanici.sifre_hash):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Yeni şifre mevcut şifrenizden farklı olmalıdır.",
+        )
+
+    kullanici.sifre_hash = sifre_hashle(istek.yeni_sifre)
+    kullanici.basarisiz_giris_sayisi = 0
+    kullanici.hesap_kilit_bitis = None
+
+    # Diğer oturumları güvenlik için geçersiz kıl. Mevcut access token
+    # süresi dolana kadar çalışabilir; sonraki yenilemede yeniden giriş gerekir.
+    db.query(RefreshToken).filter(
+        RefreshToken.kullanici_id == kullanici.id,
+        RefreshToken.iptal_edildi.is_(False),
+    ).update({RefreshToken.iptal_edildi: True}, synchronize_session=False)
+
+    db.commit()
+    return MesajYaniti(mesaj="Şifreniz başarıyla güncellendi.")
 
 
 @router.get("/ben", response_model=KullaniciYaniti)

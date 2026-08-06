@@ -6,7 +6,7 @@ import type { Dispatch, FormEvent, SetStateAction } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Kart, KartBaslik, KartBasligi, KartIcerik } from "@/components/ui/card";
-import { Girdi } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
 import { Etiket } from "@/components/ui/label";
 import { TamSayfaYukleniyor } from "@/components/ui/yukleniyor";
 import type { Ilce } from "@/types";

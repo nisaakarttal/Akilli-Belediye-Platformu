@@ -21,9 +21,9 @@ export function Altbilgi() {
         <div>
           <h4 className="mb-3 text-sm font-semibold text-metin">Hızlı Bağlantılar</h4>
           <ul className="space-y-2 text-sm text-metin-ikincil">
-            <li><Link href="/sikayet-olustur" className="hover:text-birincil-600">Şikâyet Oluştur</Link></li>
-            <li><Link href="/taleplerim" className="hover:text-birincil-600">Taleplerimi Takip Et</Link></li>
-            <li><Link href="/harita" className="hover:text-birincil-600">Belediye Haritası</Link></li>
+            <li><Link href="/panel/talep-olustur" className="hover:text-birincil-600">Şikâyet Oluştur</Link></li>
+            <li><Link href="/panel/taleplerim" className="hover:text-birincil-600">Taleplerimi Takip Et</Link></li>
+            <li><Link href="/panel/harita" className="hover:text-birincil-600">Belediye Haritası</Link></li>
             <li><Link href="/duyurular" className="hover:text-birincil-600">Duyurular ve Haberler</Link></li>
           </ul>
         </div>

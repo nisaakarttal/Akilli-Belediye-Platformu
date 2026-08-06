@@ -1,4 +1,4 @@
-import type { KategoriIstegi } from "@/lib/api/konum";
+import type { KategoriIstegi } from "@/lib/api/kategoriler";
 
 export const VARSAYILAN_KATEGORI_RENGI = "#6366F1";
 

@@ -33,10 +33,16 @@ const KARTLAR = [
     renk: "text-amber-500",
   },
   {
-    alan: "islemde",
-    etiket: "İşlemde",
+    alan: "inceleniyor",
+    etiket: "İncelenen",
     ikon: LoaderCircle,
     renk: "text-sky-500",
+  },
+  {
+    alan: "atandi",
+    etiket: "Atandı",
+    ikon: ClipboardList,
+    renk: "text-indigo-500",
   },
   {
     alan: "cozuldu",
@@ -45,10 +51,22 @@ const KARTLAR = [
     renk: "text-green-500",
   },
   {
+    alan: "geciken",
+    etiket: "Geciken",
+    ikon: AlertTriangle,
+    renk: "text-red-600",
+  },
+  {
     alan: "acil",
     etiket: "Acil",
     ikon: AlertTriangle,
-    renk: "text-red-500",
+    renk: "text-orange-500",
+  },
+  {
+    alan: "son_7_gun_cozulen",
+    etiket: "Son 7 Gün Çözülen",
+    ikon: CheckCircle2,
+    renk: "text-emerald-600",
   },
 ] as const;
 
@@ -77,7 +95,7 @@ export default function PersonelAnaSayfasi() {
       </div>
 
       {data && (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {KARTLAR.map(({ alan, etiket, ikon: Ikon, renk }) => (
             <Card key={alan}>
               <CardContent className="flex items-center justify-between p-5">

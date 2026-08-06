@@ -45,3 +45,6 @@ export function FormField({
     </div>
   );
 }
+
+// Projede kullanılan Türkçe UI ismi için geriye dönük uyumluluk alias'ı.
+export { Input as Girdi };

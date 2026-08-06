@@ -230,6 +230,9 @@ export interface GenelIstatistikler {
   cozulen_talep: number;
   bekleyen_talep: number;
   tamamlanma_orani: number;
+  geciken_talep: number;
+  acil_talep: number;
+  sla_basari_orani: number;
 }
 
 export interface KategoriDagilimi {
